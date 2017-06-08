@@ -9,7 +9,7 @@ from django.db.models import Q
 from operator import itemgetter, attrgetter, methodcaller
 import traceback
 from xos.exceptions import *
-from xos.config import Config
+from xosconfig import Config
 
 class ConfigurationError(Exception):
     pass
