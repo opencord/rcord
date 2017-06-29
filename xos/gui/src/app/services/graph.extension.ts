@@ -32,17 +32,17 @@ export class RCordGraphReducer implements IRCordGraphReducer {
     });
   }
 
-  private getSvgDimensions(graph: string): {width: number, heigth: number} {
+  private getSvgDimensions(graph: string): {width: number, height: number} {
     return {
       width: $(`${graph} svg`).width(),
-      heigth: $(`${graph} svg`).height()
+      height: $(`${graph} svg`).height()
     };
   }
 
   private positionCoarseNodes(nodes: any[]): any[] {
     // getting distance between nodes
     const hStep = this.getSvgDimensions('xos-coarse-tenancy-graph').width / 4;
-    const vStep = this.getSvgDimensions('xos-coarse-tenancy-graph').heigth / 4;
+    const vStep = this.getSvgDimensions('xos-coarse-tenancy-graph').height / 4;
 
     const vtr = _.find(nodes, {label: 'vtr'});
     if (vtr) {
@@ -172,7 +172,7 @@ export class RCordGraphReducer implements IRCordGraphReducer {
     const vLength = 5 + subscribers.length;
 
     const hStep = this.getSvgDimensions('xos-fine-grained-tenancy-graph').width / 6;
-    const vStep = this.getSvgDimensions('xos-fine-grained-tenancy-graph').heigth / vLength;
+    const vStep = this.getSvgDimensions('xos-fine-grained-tenancy-graph').height / vLength;
 
     graph.nodes = _.map(graph.nodes, n => {
       if (n.type === 'subscriber' || n.type === 'tenantroot') {
