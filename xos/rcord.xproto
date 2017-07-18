@@ -1,7 +1,7 @@
 option name = "rcord";
 option verbose_name = "RCORD Profile";
 
-message CordSubscriberRoot (TenantRoot){
+message CordSubscriberRoot (ServiceInstance) {
      option kind = "CordSubscriberRoot";
 
      required bool firewall_enable = 1 [default = False, null = False, db_index = False, blank = True];

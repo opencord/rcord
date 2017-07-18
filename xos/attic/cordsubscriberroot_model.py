@@ -14,6 +14,14 @@ sync_attributes = ("firewall_enable",
                    "status")
 
 def __init__(self, *args, **kwargs):
+    # TODO: Should probably make an RCORDService, rather than filtering by name
+    rcord_services = Service.objects.filter(name="rcord")
+    if not rcord_services:
+        # this isn't going to end well...
+        raise Exception("There is no rcord service to use as the default service for CordSubscriberRoot")
+
+    self._meta.get_field("owner").default = rcord_services[0].id
+
     super(CordSubscriberRoot, self).__init__(*args, **kwargs)
 
 def find_device(self, mac):
@@ -92,14 +100,20 @@ def invalidate_related_objects(self):
 
     # TODO: This should be reimplemented to use a watcher instead.
 
-    # NOTE: "vOLT" and "vCPE" are hardcoded below. They had better agree
-    # with the kinds defined in the vOLT and vCPE models.
+    # TODO: Hardcoded service dependency
 
-    for tenant in self.subscribed_tenants.all():
-        if tenant.kind == "vOLT":
-            for inner_tenant in tenant.subscribed_tenants.all():
-                if inner_tenant.kind == "vCPE":
-                    inner_tenant.save()
+    from services.volt.models import VOLTTenant
+    from services.vsg.models import VSGTenant
+
+    for link in self.subscribed_links.all():
+        # cast from base class to derived class
+        volts = VOLTTenant.objects.filter(serviceinstance_ptr = link.provider_service_instance)
+        for volt in volts:
+            for inner_link in volt.subscribed_links.all():
+                # cast from base class to derived class
+                vsgs = VSGTenant.objects.filter(serviceinstance_ptr = inner_link.provider_service_instance)
+                for vsg in vsgs:
+                    vsg.save()
 
 def save(self, *args, **kwargs):
     self.validate_unique_service_specific_id(none_okay=True)

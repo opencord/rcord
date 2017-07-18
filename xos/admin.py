@@ -11,7 +11,7 @@ from django.contrib.auth.signals import user_logged_in
 from django.utils import timezone
 from django.contrib.contenttypes import generic
 from suit.widgets import LinkedSelect
-from core.admin import ServiceAppAdmin,SliceInline,ServiceAttrAsTabInline, ReadOnlyAwareAdmin, XOSTabularInline, ServicePrivilegeInline, TenantRootTenantInline, TenantRootPrivilegeInline
+from core.admin import ServiceAppAdmin,SliceInline,ServiceAttrAsTabInline, ReadOnlyAwareAdmin, XOSTabularInline, ServicePrivilegeInline
 from core.middleware import get_request
 
 from functools import update_wrapper
@@ -57,11 +57,10 @@ class CordSubscriberRootAdmin(ReadOnlyAwareAdmin):
                           'classes':['suit-tab suit-tab-general']})]
     readonly_fields = ('backend_status_text', 'service_specific_attribute',)
     form = CordSubscriberRootForm
-    inlines = (TenantRootPrivilegeInline) # VOLTTenantInline
 
     suit_form_tabs =(('general', 'Cord Subscriber Root Details'),
 #        ('volttenants','VOLT Tenancy'),
-        ('tenantrootprivileges','Privileges')
+#        ('tenantrootprivileges','Privileges')
     )
 
     def get_queryset(self, request):
