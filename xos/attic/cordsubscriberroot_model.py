@@ -14,6 +14,14 @@ sync_attributes = ("firewall_enable",
                    "status")
 
 def __init__(self, *args, **kwargs):
+    # TODO: Should probably make an RCORDService, rather than filtering by name
+    rcord_services = Service.objects.filter(name="rcord")
+    if not rcord_services:
+        # this isn't going to end well...
+        raise Exception("There is no rcord service to use as the default service for CordSubscriberRoot")
+
+    self._meta.get_field("owner").default = rcord_services[0].id
+
     super(CordSubscriberRoot, self).__init__(*args, **kwargs)
 
 def find_device(self, mac):
