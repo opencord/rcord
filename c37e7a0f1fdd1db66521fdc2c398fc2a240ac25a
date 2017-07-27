@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a1a2d67_67659a44",
+        "filename": "xos/attic/cordsubscriberroot_model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000007
+      },
+      "writtenOn": "2017-07-27T15:54:26Z",
+      "side": 1,
+      "message": "What about using the \"kind\" property. Like setting it to \"profile\" (or some more meaningful word) and allow just one service of kind\u003dprofile for deployment?",
+      "range": {
+        "startLine": 17,
+        "startChar": 6,
+        "endLine": 17,
+        "endChar": 79
+      },
+      "revId": "c37e7a0f1fdd1db66521fdc2c398fc2a240ac25a",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
