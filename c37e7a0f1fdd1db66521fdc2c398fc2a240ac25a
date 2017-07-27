@@ -22,6 +22,30 @@
       "revId": "c37e7a0f1fdd1db66521fdc2c398fc2a240ac25a",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a1a2d67_47d17ecc",
+        "filename": "xos/attic/cordsubscriberroot_model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2017-07-27T16:05:26Z",
+      "side": 1,
+      "message": "I\u0027ll have to think about how this is going to interact with multiple flavors of CORD at the same time. It depends on whether we end up with multiple subscribers (I think we do, as each flavor\u0027s subscribers may have different properties). We probably need to sync up with M- and E- cord and see how they\u0027re modeling their subscribers.",
+      "parentUuid": "1a1a2d67_67659a44",
+      "range": {
+        "startLine": 17,
+        "startChar": 6,
+        "endLine": 17,
+        "endChar": 79
+      },
+      "revId": "c37e7a0f1fdd1db66521fdc2c398fc2a240ac25a",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
