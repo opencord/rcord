@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a5c5d37_2799fa6e",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2017-09-12T19:33:47Z",
+      "side": 1,
+      "message": "Is this this saying that it\u0027s a profile we maintain/support, or a maturity statement (alpha/beta/release, etc.)?",
+      "range": {
+        "startLine": 3,
+        "startChar": 41,
+        "endLine": 3,
+        "endChar": 52
+      },
+      "revId": "6b1d854a108b9076c5e5853fd012751d7027cbb1",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
