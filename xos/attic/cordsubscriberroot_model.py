@@ -116,30 +116,20 @@ def invalidate_related_objects(self):
 
     # TODO: This should be reimplemented to use a watcher instead.
 
-    # TODO: Hardcoded service dependency
-
-    from services.volt.models import VOLTTenant
-    from services.vsg.models import VSGTenant
-
     for link in self.subscribed_links.all():
-        # cast from base class to derived class
-        volts = VOLTTenant.objects.filter(serviceinstance_ptr = link.provider_service_instance)
-        for volt in volts:
-            for inner_link in volt.subscribed_links.all():
-                # cast from base class to derived class
-                vsgs = VSGTenant.objects.filter(serviceinstance_ptr = inner_link.provider_service_instance)
-                for vsg in vsgs:
-                    vsg.save()
+        volt_service_instance = link.provider_service_instance
+        for link in volt_service_instance.subscribed_links.all():
+            vsg_service_instance = link.provider_service_instance
+            vsg_service_instance.save(update_fields = ["updated"])
 
 def __xos_save_base(self, *args, **kwargs):
     self.validate_unique_service_specific_id(none_okay=True)
     if (not hasattr(self, 'caller') or not self.caller.is_admin):
         if (self.has_field_changed("service_specific_id")):
             raise XOSPermissionDenied("You do not have permission to change service_specific_id")
-    
+
     super(CordSubscriberRoot, self).save(*args, **kwargs)
 
     self.invalidate_related_objects()
 
-    return True     # Indicate that we called super.save()
-
+    return True
