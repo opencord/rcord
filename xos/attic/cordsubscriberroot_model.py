@@ -131,12 +131,15 @@ def invalidate_related_objects(self):
                 for vsg in vsgs:
                     vsg.save()
 
-def save(self, *args, **kwargs):
+def __xos_save_base(self, *args, **kwargs):
     self.validate_unique_service_specific_id(none_okay=True)
     if (not hasattr(self, 'caller') or not self.caller.is_admin):
         if (self.has_field_changed("service_specific_id")):
             raise XOSPermissionDenied("You do not have permission to change service_specific_id")
+    
     super(CordSubscriberRoot, self).save(*args, **kwargs)
 
     self.invalidate_related_objects()
+
+    return True     # Indicate that we called super.save()
 
