@@ -1,0 +1,106 @@
+<!--
+Copyright 2017-present Open Networking Foundation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<div class="row" ng-if="!vm.selectedSubscriber.status">
+    <div class="col-xs-12">
+        <h2>Select Subscriber:</h2>
+        <input
+          type="text"
+          ng-model="vm.selectedSubscriber"
+          uib-typeahead="s as s.name for s in vm.subscribers | filter:$viewValue | limitTo:8"
+          class="form-control">
+    </div>
+</div>
+
+<div class="row" ng-if="vm.selectedSubscriber.status">
+    <div class="col-xs-12">
+        <form>
+            <div class="form-group">
+                <h2>Status:</h2>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-xs-3" ng-repeat="s in vm.statusFieldOptions">
+                        <a
+                          class="btn btn-default btn-block"
+                          ng-click="vm.selectedSubscriber.status = s.id"
+                          ng-class="{'active': s.id === vm.selectedSubscriber.status}">
+                            {{s.label}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <h2>Bandwith:</h2>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <label>Uplink speed:</label>
+                        <rzslider
+                          rz-slider-model="vm.selectedSubscriber.uplink_speed"
+                          rz-slider-options="vm.slider"></rzslider>
+                    </div>
+                    <div class="col-xs-6">
+                        <label>Downlink speed:</label>
+                        <rzslider
+                          rz-slider-model="vm.selectedSubscriber.downlink_speed"
+                          rz-slider-options="vm.slider"></rzslider>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <h2>
+                    Devices:
+                    <a ng-click="vm.addDevice(vm.selectedSubscriber)">
+                        <small class="label label-default">
+                            <i class="fa fa-plus"></i>
+                        </small>
+                    </a>
+                </h2>
+            </div>
+            <div class="row">
+                <div class="col-md-3 col-sm-6" ng-repeat="d in vm.selectedSubscriber.service_specific_attribute.devices">
+                    <div class="panel panel-filled">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <a ng-click="vm.removeDevice(vm.selectedSubscriber, d)">
+                                    <i class="fa fa-remove pull-right"></i>
+                                </a>
+                            </div>
+                            <div class="form-group">
+                                <label>Name:</label>
+                                <input class="form-control" type="text" ng-model="d.name"/>
+                            </div>
+                            <div class="form-group">
+                                <label>MAC Address:</label>
+                                <input class="form-control" type="text" ng-model="d.mac"/>
+                            </div>
+                            <div class="form-group">
+                                <label>Filter level:</label>
+                                <select class="form-control" ng-model="d.level" ng-options="l for l in vm.levelOptions"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-success" ng-click="vm.save(vm.selectedSubscriber)">Save</button>
+                <button class="btn btn-info" ng-click="vm.selectedSubscriber = null">Reset</button>
+            </div>
+        </form>
+    </div>
+</div>
