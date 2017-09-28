@@ -1,0 +1,11 @@
+.rzslider .rz-pointer {
+  background-color: #f6a821;
+  width: 20px;
+  height: 20px;
+  top: -8px;
+
+  &:after {
+    top: 6px;
+    left: 6px;
+  }
+}
