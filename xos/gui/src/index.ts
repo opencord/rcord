@@ -53,6 +53,7 @@ angular.module('xos-rcord-gui-extension', [
     });
 
     window.setTimeout(() => {
+      $log.info('[xos-rcord-graph-gui-extension] Adding nav item')
       XosNavigationService.add({
         label: 'Dashboard',
         state: 'xos.rcord.dashboard',

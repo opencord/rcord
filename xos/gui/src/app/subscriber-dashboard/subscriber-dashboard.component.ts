@@ -16,6 +16,7 @@
 
 import * as _ from 'lodash';
 import './subscriber-dashboard.scss';
+
 import {IRCordSubscriber, IRCordSubscriberDevice} from '../interfaces/rcord-subscriber.interface';
 
 class RcordSubscriberDashboardCtrl {
@@ -33,7 +34,7 @@ class RcordSubscriberDashboardCtrl {
     floor: 0,
     ceil: 1000000000,
     translate: (value) => {
-      return Math.floor(value / 1000000);
+      return `${Math.floor(value / 1000000)} MB`;
     }
   };
   public selectedSubscriber: IRCordSubscriber;
@@ -72,6 +73,7 @@ class RcordSubscriberDashboardCtrl {
     if (angular.isUndefined(subscriber.service_specific_attribute.devices)) {
       subscriber.service_specific_attribute.devices = [];
     }
+
     subscriber.service_specific_attribute.devices.push({
       name: '',
       mac: '',
@@ -85,6 +87,8 @@ class RcordSubscriberDashboardCtrl {
 
   public save(subscriber: IRCordSubscriber) {
     const item: any = angular.copy(subscriber);
+
+    delete item.updated;
 
     _.forEach(Object.keys(item), prop => {
       if (prop.indexOf('-formatted') > -1 || prop.indexOf('_ptr') > -1) {
@@ -125,4 +129,4 @@ export const rcordSubscriberDashboard: angular.IComponentOptions = {
   template: require('./subscriber-dashboard.html'),
   controllerAs: 'vm',
   controller: RcordSubscriberDashboardCtrl
-};
+}
