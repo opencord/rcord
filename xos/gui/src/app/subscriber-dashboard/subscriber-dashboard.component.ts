@@ -16,8 +16,9 @@
 
 import * as _ from 'lodash';
 import './subscriber-dashboard.scss';
+import {IRCordSubscriber, IRCordSubscriberDevice} from '../interfaces/rcord-subscriber.interface';
 
-class rcordSubscriberDashboardCtrl {
+class RcordSubscriberDashboardCtrl {
 
   static $inject = [
     'toastr',
@@ -26,7 +27,7 @@ class rcordSubscriberDashboardCtrl {
   ];
 
   public levelOptions = [];
-  public subscribers = [];
+  public subscribers: IRCordSubscriber[] = [];
   public statusFieldOptions = [];
   public slider = {
     floor: 0,
@@ -35,6 +36,7 @@ class rcordSubscriberDashboardCtrl {
       return Math.floor(value / 1000000);
     }
   };
+  public selectedSubscriber: IRCordSubscriber;
 
   private subscriberDef;
 
@@ -66,40 +68,61 @@ class rcordSubscriberDashboardCtrl {
     this.statusFieldOptions = _.find(this.subscriberDef.fields, {name: 'status'}).options;
   }
 
-  public addDevice(subscriber) {
+  public addDevice(subscriber: IRCordSubscriber) {
+    if (angular.isUndefined(subscriber.service_specific_attribute.devices)) {
+      subscriber.service_specific_attribute.devices = [];
+    }
     subscriber.service_specific_attribute.devices.push({
       name: '',
       mac: '',
       level: 'PG_13'
-    })
+    });
   }
 
-  public removeDevice(subscriber, device) {
-    _.remove(subscriber.service_specific_attribute.devices, {name:device.name})
+  public removeDevice(subscriber: IRCordSubscriber, device: IRCordSubscriberDevice) {
+    _.remove(subscriber.service_specific_attribute.devices, {name: device.name});
   }
 
-  public save(subscriber) {
-    console.log(subscriber);
+  public save(subscriber: IRCordSubscriber) {
     const item: any = angular.copy(subscriber);
+
+    _.forEach(Object.keys(item), prop => {
+      if (prop.indexOf('-formatted') > -1 || prop.indexOf('_ptr') > -1) {
+        delete item[prop];
+      }
+    });
+
     item.service_specific_attribute = JSON.stringify(item.service_specific_attribute);
     item.$save()
       .then(() => {
         this.toastr.success(`Subscriber successfully saved`);
+      })
+      .catch(e => {
+        this.toastr.error(`Error while saving subscriber`);
+        console.error(e);
       });
   }
 
-  private parseSubscribers(subscribers) {
+  private parseSubscribers(subscribers: IRCordSubscriber) {
     return _.map(subscribers, (s) => {
       if (angular.isString(s.service_specific_attribute)) {
-        s.service_specific_attribute = JSON.parse(s.service_specific_attribute);
+        try {
+          s.service_specific_attribute = JSON.parse(s.service_specific_attribute);
+        } catch (e) {
+          s.service_specific_attribute = {};
+        }
       }
       return s;
-    })
+    });
+  }
+
+  $onDestroy() {
+    this.selectedSubscriber.service_specific_attribute = JSON.stringify(this.selectedSubscriber.service_specific_attribute);
   }
 }
 
 export const rcordSubscriberDashboard: angular.IComponentOptions = {
   template: require('./subscriber-dashboard.html'),
   controllerAs: 'vm',
-  controller: rcordSubscriberDashboardCtrl
+  controller: RcordSubscriberDashboardCtrl
 };
