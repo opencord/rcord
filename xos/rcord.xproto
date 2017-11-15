@@ -1,8 +1,8 @@
 option name = "rcord";
-option verbose_name = "RCORD Profile";
 
 message CordSubscriberRoot (ServiceInstance) {
      option kind = "CordSubscriberRoot";
+     option verbose_name = "RCORD Subscriber";
 
      required bool firewall_enable = 1 [default = False, null = False, db_index = False, blank = True];
      optional string firewall_rules = 2 [default = "accept all anywhere anywhere", null = True, db_index = False, blank = True];
