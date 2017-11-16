@@ -36,7 +36,7 @@ exports.ngModule = 'app';
  */
 exports.paths = {
   src: 'src',
-  dist: 'dist/extensions/rcord', // NOTE that 'rcord' have to match the extension name provided in platform install
+  dist: 'dist',
   appConfig: 'conf/app',
   tmp: '.tmp',
   e2e: 'e2e',
