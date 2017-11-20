@@ -41,6 +41,7 @@ message CordSubscriberRoot (ServiceInstance) {
 	 }
 ```
 ## GUI Extensions
-R-CORD does not include any GUI extensions.
+R-CORD includes the following GUI extensions:
 
-## Stay tuned. More documentation coming soon!
+* [vtr](https://github.com/opencord/vtr/tree/master/xos/gui)
+* [rcord](https://github.com/opencord/rcord/tree/master/xos/gui)
