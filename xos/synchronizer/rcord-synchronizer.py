@@ -14,18 +14,19 @@
 # limitations under the License.
 
 
-tosca_definitions_version: tosca_simple_yaml_1_0
+#!/usr/bin/env python
 
-description: Onboard rcord models
+# This imports and runs ../../xos-observer.py
 
-imports:
-   - custom_types/xos.yaml
+import importlib
+import os
+import sys
+from xosconfig import Config
 
-topology_template:
-  node_templates:
-    library#rcord:
-      type: tosca.nodes.ServiceController
-      properties:
-          base_url: file:///opt/cord/orchestration/profiles/rcord/xos/
-          # The following will concatenate with base_url automatically, if
-          # base_url is non-null.
+config_file = os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + '/rcord_config.yaml')
+Config.init(config_file, 'synchronizer-config-schema.yaml')
+
+observer_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"../../synchronizers/new_base")
+sys.path.append(observer_path)
+mod = importlib.import_module("xos-synchronizer")
+mod.main()
