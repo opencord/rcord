@@ -45,8 +45,8 @@ topology_template:
               node: service#ONOS_Fabric
               relationship: tosca.relationships.BelongsToOne
       properties:
-          name: fabric_network_cfg_json
-          value: {{ fabric_network_cfg_json }}
+          name: rest_onos/v1/network/configuration/
+          value: '{{ fabric_network_cfg_json | to_json }}'
 
     service#fabric:
       type: tosca.nodes.FabricService

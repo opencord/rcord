@@ -41,9 +41,6 @@ xos_new_tosca_config_templates:
   - service-graph-constraints.yaml
   - xos-gui-extensions.yml
 
-xos_other_templates:
-  - fabric-network-cfg.json
-
 enabled_gui_extensions:
   - name: vtr
     path: orchestration/xos_services/vtr/xos/gui
