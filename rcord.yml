@@ -93,11 +93,6 @@ xos_dynamic_services:
 # service graph gui constraints
 xos_gui_service_graph_constraints: '[[null, "rcord"], [null, "volt"], ["addressmanager", "vsg"], [null, "vrouter"]]'
 
-# VTN network configuration
-management_network_cidr: 172.27.0.0/24
-management_network_ip: 172.27.0.1/24
-data_plane_ip: 10.168.0.253/24
-
 # Juju config
 charm_versions:
   ceilometer-agent: "cs:trusty/ceilometer-agent-13"

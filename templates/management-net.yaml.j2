@@ -49,7 +49,7 @@ topology_template:
       properties:
         name: management
         # ip_version: 4
-        subnet: {{ management_network_cidr }}
+        subnet: {{ vtn_net_management_local_cidr }}
         permit_all_slices: true
       requirements:
         - template:
