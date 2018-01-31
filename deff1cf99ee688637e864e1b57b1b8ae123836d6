@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "edc1c81d_9bffccdc",
+        "filename": "rcord.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-01-31T00:56:47Z",
+      "side": 1,
+      "message": "You could omit this entirely, as this is the default: https://guide.opencord.org/build_glossary.html#xosothertemplates",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 23
+      },
+      "revId": "deff1cf99ee688637e864e1b57b1b8ae123836d6",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    }
+  ]
+}
