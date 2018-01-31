@@ -134,7 +134,7 @@ topology_template:
         name: addresses_vsg
         addresses: {{ addresspool_vsg_cidr }}
         gateway_ip: {{ addresspool_vsg_cidr | ipaddr('1') | ipaddr('address') }}
-        gateway_mac:  {{ ( vtn_net_public_hwaddr_prefix ~ ( vtn_net_public_cidr | ipaddr('1') | ipaddr('address') | ip4_hex )) | hwaddr('unix') }}
+        gateway_mac:  {{ ( vtn_net_public_hwaddr_prefix ~ ( vtn_net_public_cidr | ipaddr('1') | ipaddr('address') | ip4_hex )) | hwaddr('linux') }}
       requirements:
         - service:
             node: service#addressmanager
@@ -146,7 +146,7 @@ topology_template:
         name: addresses_public
         addresses: {{ addresspool_public_cidr }}
         gateway_ip: {{ addresspool_public_cidr | ipaddr('1') | ipaddr('address') }}
-        gateway_mac:  {{ ( vtn_net_public_hwaddr_prefix ~ ( vtn_net_public_cidr | ipaddr('1') | ipaddr('address') | ip4_hex )) | hwaddr('unix') }}
+        gateway_mac:  {{ ( vtn_net_public_hwaddr_prefix ~ ( vtn_net_public_cidr | ipaddr('1') | ipaddr('address') | ip4_hex )) | hwaddr('linux') }}
       requirements:
         - service:
             node: service#addressmanager
