@@ -21,8 +21,13 @@ cord_profile: rcord
 
 # copy kubespray config and kubectl to VM host
 kubeconfig_localhost: true
-kubectl_localhost: true
 
-# enable helm in kubespray
-helm_enabled: true
+# Set the site name
+site_name: mykube
+site_humanname: MyKube
+site_suffix: "{{ site_name }}.opencord.lab"
+
+docker_registry_ext_port: "5000"
+
+deploy_docker_registry: "registry.{{ site_suffix }}:{{ docker_registry_ext_port }}"
 
