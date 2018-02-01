@@ -19,10 +19,11 @@
 cord_scenario: controlkube
 cord_profile: rcord
 
-# copy kubespray config and kubectl to VM host
+# copy kubespray config to config host
 kubeconfig_localhost: true
-kubectl_localhost: true
 
-# enable helm in kubespray
-helm_enabled: true
+# Set the site name
+site_name: mykube
+site_humanname: MyKube
+site_suffix: "{{ site_name }}.cord.lab"
 
