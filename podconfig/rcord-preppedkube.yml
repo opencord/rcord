@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# rcord-controlkube Pod Config
-# Creates a kubernetes enabled controlpod
+# rcord-preppedkube Pod Config
+# Creates a kubernetes enabled preppedpod
 
-cord_scenario: controlkube
+cord_scenario: preppedkube
 cord_profile: rcord
 
 # copy kubespray config to config host
