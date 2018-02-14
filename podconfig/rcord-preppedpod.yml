@@ -14,8 +14,23 @@
 # limitations under the License.
 
 # rcord-preppedpod POD Config
-# Creates a multi-node POD on pre-prepared systems (OS installed) with R-CORD services
+#
+# Creates a multi-node POD on pre-prepared systems (OS installed) with R-CORD
+# services
 
 cord_scenario: preppedpod
 cord_profile: rcord
 
+# Virtual-specific config of network interfaces, for virtual install in Vagrant
+#
+# which network interfaces belong to which bond on nodes
+management_net_interfaces:
+  - eth1
+
+fabric_net_interfaces:
+  - eth2
+
+# Bring up alias interfaces for the vsg and public networks, for forwarding
+# traffic in virtual pod
+use_addresspool_vsg: True
+use_addresspool_public: True

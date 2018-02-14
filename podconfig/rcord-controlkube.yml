@@ -31,3 +31,16 @@ site_suffix: "{{ site_name }}.cord.lab"
 docker_registry_ext_port: "5000"
 deploy_docker_registry: "docker-registry.{{ site_suffix }}:{{ docker_registry_ext_port }}"
 
+# Virtual-specific config of network interfaces, for virtual install in Vagrant
+#
+# which network interfaces belong to which bond on nodes
+management_net_interfaces:
+  - eth1
+
+fabric_net_interfaces:
+  - eth2
+
+# Bring up alias interfaces for the vsg and public networks, for forwarding
+# traffic in virtual pod
+use_addresspool_vsg: True
+use_addresspool_public: True
