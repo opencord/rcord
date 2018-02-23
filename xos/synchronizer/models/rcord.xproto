@@ -1,4 +1,5 @@
 option name = "rcord";
+option app_label = "rcord";
 option verbose_name = "RCORD Profile";
 
 message CordSubscriberRoot (ServiceInstance) {
