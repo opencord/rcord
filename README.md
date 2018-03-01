@@ -47,4 +47,3 @@ R-CORD includes the following GUI extensions:
 
 * [vtr](https://github.com/opencord/vtr/tree/master/xos/gui)
 * [rcord](https://github.com/opencord/rcord/tree/master/xos/gui)
-*
