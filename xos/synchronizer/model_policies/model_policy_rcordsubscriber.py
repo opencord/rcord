@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from synchronizers.new_base.modelaccessor import VOLTTenant, ServiceInstanceLink
+from synchronizers.new_base.modelaccessor import VOLTServiceInstance, ServiceInstanceLink
 from synchronizers.new_base.policy import Policy
 
 class RCORDSubscriberPolicy(Policy):
@@ -44,7 +44,7 @@ class RCORDSubscriberPolicy(Policy):
             # we don't know what the next service in the chain will be
 
             if ps.model_name is "VOLTService":
-                volt = VOLTTenant(name="volt-for-subscriber-%s" % si.id)
+                volt = VOLTServiceInstance(name="volt-for-subscriber-%s" % si.id)
                 volt.save()
 
                 si_link = ServiceInstanceLink(
