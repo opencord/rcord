@@ -108,7 +108,7 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
         si.owner = owner
 
         with patch.object(owner.subscribed_dependencies, 'all', MagicMock(return_value=[MockLink()])), \
-             patch.object(VOLTTenant, "save", autospec=True) as save_volt, \
+             patch.object(VOLTServiceInstance, "save", autospec=True) as save_volt, \
              patch.object(ServiceInstanceLink, "save", autospec=True) as save_link:
             self.policy.handle_create(si)
             self.assertEqual(save_link.call_count, 1)

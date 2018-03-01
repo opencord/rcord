@@ -38,6 +38,8 @@ message CordSubscriberRoot (ServiceInstance) {
      required int32 downlink_speed = 9 [default = 1000000000, null = False, db_index = False, blank = False];
      required bool enable_uverse = 10 [default = True, null = False, db_index = False, blank = True];
      required string status = 11 [default = "enabled", choices = "(('enabled', 'Enabled'), ('suspended', 'Suspended'), ('delinquent', 'Delinquent'), ('copyrightviolation', 'Copyright Violation'))", max_length = 30, content_type = "stripped", blank = False, null = False, db_index = False];
+     optional int32 s_tag = 12 [help_text = "s-tag", null = True, db_index = False, blank = False];
+     optional int32 c_tag = 13 [help_text = "c-tag", null = True, db_index = False, blank = False];
 	 }
 ```
 ## GUI Extensions
@@ -45,3 +47,4 @@ R-CORD includes the following GUI extensions:
 
 * [vtr](https://github.com/opencord/vtr/tree/master/xos/gui)
 * [rcord](https://github.com/opencord/rcord/tree/master/xos/gui)
+*
