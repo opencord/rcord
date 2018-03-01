@@ -1,6 +1,7 @@
 option name = "rcord";
 option app_label = "rcord";
 option verbose_name = "RCORD Subscriber";
+option legacy="True";
 
 message CordSubscriberRoot (ServiceInstance) {
     option kind = "CordSubscriberRoot";
