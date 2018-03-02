@@ -16,6 +16,7 @@
 from xos.exceptions import *
 from models_decl import *
 from core.models import Service
+from random import randint
 
 class CordSubscriberRoot(CordSubscriberRoot_decl):
     class Meta:
@@ -34,6 +35,13 @@ class CordSubscriberRoot(CordSubscriberRoot_decl):
                 inner_service_instance = link.provider_service_instance
                 inner_service_instance.save(update_fields=["updated"])
 
+    def generate_unique_tag(self, tag_name):
+        tag = randint(100, 4096)
+        existing_tags = [getattr(self, tag_name) for i in CordSubscriberRoot.objects.all()]
+        if tag in existing_tags:
+            return self.generate_unique_tag(tag_name)
+        return tag
+
     def save(self, *args, **kwargs):
         self.validate_unique_service_specific_id(none_okay=True)
 
@@ -43,6 +51,13 @@ class CordSubscriberRoot(CordSubscriberRoot_decl):
             self.owner_id = rcord_service.id
         except IndexError:
             raise XOSValidationError("Service RCORD cannot be found, please make sure that the model exists.")
+
+        # NOTE generating s_tag and c_tag
+        if not self.s_tag:
+            self.s_tag = self.generate_unique_tag('s_tag')
+        if not self.c_tag:
+            self.c_tag = self.generate_unique_tag('c_tag')
+
 
         if (not hasattr(self, 'caller') or not self.caller.is_admin):
             if (self.has_field_changed("service_specific_id")):
