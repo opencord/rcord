@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from synchronizers.new_base.modelaccessor import VOLTServiceInstance, ServiceInstanceLink
+from synchronizers.new_base.modelaccessor import ServiceInstanceLink, model_accessor
 from synchronizers.new_base.policy import Policy
 
 class RCORDSubscriberPolicy(Policy):
@@ -39,22 +39,15 @@ class RCORDSubscriberPolicy(Policy):
 
         for link in links:
             ps = link.provider_service.leaf_model
+            si_class = link.provider_service.get_service_instance_class_name()
+            self.logger.info("MODEL_POLICY: RCORDSubscriberRoot %s creating %s" % (si, si_class))
 
-            # FIXME we should use get_service_instance_class here to support the general case.
-            # we don't know what the next service in the chain will be
-
-            if ps.model_name is "VOLTService":
-                volt = VOLTServiceInstance(name="volt-for-subscriber-%s" % si.id)
-                volt.save()
-
-                si_link = ServiceInstanceLink(
-                    provider_service_instance=volt,
-                    subscriber_service_instance=si
-                )
-                si_link.save()
-
-        print links
-
+            eastbound_si_class = model_accessor.get_model_class(si_class)
+            eastbound_si = eastbound_si_class()
+            eastbound_si.owner_id = link.provider_service_id
+            eastbound_si.save()
+            link = ServiceInstanceLink(provider_service_instance=eastbound_si, subscriber_service_instance=si)
+            link.save()
 
     def handle_delete(self, si):
         pass
