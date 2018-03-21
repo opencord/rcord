@@ -44,6 +44,13 @@ class CordSubscriberRoot(CordSubscriberRoot_decl):
         except IndexError:
             raise XOSValidationError("Service RCORD cannot be found, please make sure that the model exists.")
 
+        if not self.creator:
+            if not getattr(self, "caller", None):
+                # caller must be set when creating a vCPE since it creates a slice
+                raise XOSProgrammingError("CordSubscriberRoot's self.caller was not set")
+            self.creator = self.caller
+
+        # TODO: What is this for?
         if (not hasattr(self, 'caller') or not self.caller.is_admin):
             if (self.has_field_changed("service_specific_id")):
                 raise XOSPermissionDenied("You do not have permission to change service_specific_id")
