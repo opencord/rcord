@@ -27,7 +27,6 @@ config_file = os.path.join(cwd, "test_config.yaml")
 
 # NOTE this have to start for xos_services
 RCORD_XPROTO = "../profiles/rcord/xos/synchronizer/models/rcord.xproto"
-OLT_XPROTO = "olt-service/xos/synchronizer/models/volt.xproto"
 
 Config.clear()
 Config.init(config_file, 'synchronizer-config-schema.yaml')
@@ -76,7 +75,7 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
         self.original_sys_path = sys.path
 
         # Generate a fake model accessor (emulate the client library)
-        build_mock_modelaccessor(xos_dir, services_dir, [RCORD_XPROTO, OLT_XPROTO])
+        build_mock_modelaccessor(xos_dir, services_dir, [RCORD_XPROTO])
 
         import synchronizers.new_base.modelaccessor
         from synchronizers.new_base.modelaccessor import model_accessor
