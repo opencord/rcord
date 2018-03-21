@@ -22,22 +22,19 @@ import os, sys
 
 cwd=os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 xos_dir=os.path.abspath(os.path.join(cwd, "../../../../../../orchestration/xos/xos"))
-# services_dir=os.path.join(xos_dir, "../../xos_services")
+services_dir=os.path.join(xos_dir, "../../xos_services")
 config_file = os.path.join(cwd, "test_config.yaml")
 
 # NOTE this have to start for xos_services
-# RCORD_XPROTO = "../profiles/rcord/xos/synchronizer/models/rcord.xproto"
-# OLT_XPROTO = "olt-service/xos/synchronizer/models/volt.xproto"
+RCORD_XPROTO = "../profiles/rcord/xos/synchronizer/models/rcord.xproto"
+OLT_XPROTO = "olt-service/xos/synchronizer/models/volt.xproto"
 
 Config.clear()
 Config.init(config_file, 'synchronizer-config-schema.yaml')
 
 # FIXME move the synchronizer framework into a library
 sys.path.append(xos_dir)
-# from synchronizers.new_base.mock_modelaccessor_build import build_mock_modelaccessor
-from synchronizers.new_base.modelaccessor import model_accessor
-
-from model_policy_rcordsubscriber import RCORDSubscriberPolicy
+from synchronizers.new_base.mock_modelaccessor_build import build_mock_modelaccessor
 
 class MockSubscriber:
 
@@ -74,10 +71,16 @@ class MockLink:
 
 class TestModelPolicyRCORDSubscriber(unittest.TestCase):
     def setUp(self):
+        global model_accessor
+
         self.original_sys_path = sys.path
 
         # Generate a fake model accessor (emulate the client library)
-        # build_mock_modelaccessor(xos_dir, services_dir, [RCORD_XPROTO, OLT_XPROTO])
+        build_mock_modelaccessor(xos_dir, services_dir, [RCORD_XPROTO, OLT_XPROTO])
+
+        import synchronizers.new_base.modelaccessor
+        from synchronizers.new_base.modelaccessor import model_accessor
+        from model_policy_rcordsubscriber import RCORDSubscriberPolicy
 
         # import all class names to globals
         for (k, v) in model_accessor.all_model_classes.items():

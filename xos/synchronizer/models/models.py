@@ -44,6 +44,15 @@ class CordSubscriberRoot(CordSubscriberRoot_decl):
         except IndexError:
             raise XOSValidationError("Service RCORD cannot be found, please make sure that the model exists.")
 
+        # VSGServiceInstance will extract the creator from the Subscriber, as it needs a creator to create its
+        # Instance.
+        if not self.creator:
+            # If we weren't passed an explicit creator, then we will assume the caller is the creator.
+            if not getattr(self, "caller", None):
+                raise XOSProgrammingError("CordSubscriberRoot's self.caller was not set")
+            self.creator = self.caller
+
+        # TODO: What is this for?
         if (not hasattr(self, 'caller') or not self.caller.is_admin):
             if (self.has_field_changed("service_specific_id")):
                 raise XOSPermissionDenied("You do not have permission to change service_specific_id")

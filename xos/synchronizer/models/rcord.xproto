@@ -20,4 +20,5 @@ message CordSubscriberRoot (ServiceInstance) {
     optional int32 c_tag = 12 [null = True, db_index = False, blank = False];
     required string olt_device = 13 [help_text = "VOLTDevice device_id", null = False, db_index = False, blank = False];
     required string olt_port = 14 [help_text = "VOLTDevicePort port_id", null = False, db_index = False, blank = False];
+    optional manytoone creator->User:created_rcord_subscribers = 15 [db_index = True, null = True, blank = True];
 }
