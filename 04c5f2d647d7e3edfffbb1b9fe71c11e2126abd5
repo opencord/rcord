@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6f491eb5_3dbcc06b",
+        "filename": "docs/voltha_install.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1000007
+      },
+      "writtenOn": "2018-03-22T16:49:06Z",
+      "side": 1,
+      "message": "This is not available anymore, we\u0027ll have to use the new TOSCA engine",
+      "range": {
+        "startLine": 170,
+        "startChar": 0,
+        "endLine": 170,
+        "endChar": 126
+      },
+      "revId": "04c5f2d647d7e3edfffbb1b9fe71c11e2126abd5",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
