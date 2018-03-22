@@ -131,15 +131,15 @@ For example:
 ```
 ...
 “ports” {
-   …
-   },
-   "of:0000cc37ab6180ca/9": {
-            "interfaces": [
-                {
-                    "vlan-tagged" : [ 300 ]
-                }
-            ]
-        }
+    …
+    },
+    "of:0000cc37ab6180ca/9": {
+        "interfaces": [
+            {
+                "vlan-tagged" : [ 300 ]
+            }
+        ]
+    }
 }
 ```
 
@@ -150,16 +150,16 @@ under the same existing port config for the data traffic from the OLT:
 ```
 ...
 "of:0000cc37ab6180ca/5": {
-            "interfaces": [
-                {
-                    "ips": [ "10.6.1.254/24" ],
-                    "vlan-untagged" : 1
-                },
-                {
-                    "vlan-tagged" : [ 300 ]
-                }
-            ]
-        }
+    "interfaces": [
+        {
+            "ips": [ "10.6.1.254/24" ],
+                "vlan-untagged" : 1
+            },
+            {
+                "vlan-tagged" : [ 300 ]
+            }
+        ]
+    }
 ...
 ```
 
@@ -167,14 +167,14 @@ Run the following command on the head node to refresh the config in
 ONOS:
 
 ```
-docker-compose -p rcord exec xos_ui python /opt/xos/tosca/run.py xosadmin@opencord.org /opt/cord_profile/fabric-service.yaml
+$ curl -H "xos-username: xosadmin@opencord.org" -H "xos-password: `cat /opt/credentials/xosadmin@opencord.org`" -X POST --data-binary @/opt/cord_profile/fabric-service.yaml http://localhost:9102/xos-tosca/run
 ```
 
 Now it is best to log in to the fabric ONOS and verify that the config was
 received properly:
 
 ```
-ssh karaf@localhost -p 8101      #password=karaf
+$ ssh karaf@localhost -p 8101      #password=karaf
 ```
 
 Run the `interfaces` command and verify that your new `vlanTagged`
@@ -211,7 +211,7 @@ Before we run VOLTHA, we’ll need to prepare our ONOS configuration. This is
 because the stack file will bring up ONOS at the same time as it brings up
 VOLTHA, and ONOS needs to be configured at system startup.
 
-Create a config file that looks like this: (where?)
+Create a config file that looks like this in `~/network-cfg.json`
 
 ```
 {
@@ -235,22 +235,29 @@ Prepare the node as a single-node docker swarm (substitute the dataplane IP
 address of the node on which you are running VOLTHA):
 
 ```
-docker swarm init --advertise-addr 10.6.1.2
+$ docker swarm init --advertise-addr 10.6.1.2
 ```
 
 ### Run a Released Version of VOLTHA
 
-Run `curl` with
+Download the VOLTHA run script:
 
 ```
-REPOSITORY=voltha/ TAG=1.2.1 ./run-voltha.sh start
+$ curl https://raw.githubusercontent.com/opencord/voltha/voltha-1.2/scripts/run-voltha.sh > run-voltha.sh
+$ chmod +x run-voltha.sh
+```
+
+Then you can start voltha like this:
+
+```
+$ ONOS_CONFIG=~/network-cfg.json REPOSITORY=voltha/ TAG=1.2.1 ./run-voltha.sh start
 ```
 
 Now we have started a single-node VOLTHA stack. You can use the following
 command to see the various containers that are runnning as part of the stack:
 
 ```
-docker stack ps voltha
+$ docker stack ps voltha
 ```
 
 ## Provision the OLT + ONU
@@ -258,7 +265,7 @@ docker stack ps voltha
 Access VOLTHA's CLI with:
 
 ```
-ssh voltha@localhost -p 5022
+$ ssh voltha@localhost -p 5022
 ```
 
 Run the health command and verify you get this output:
@@ -276,7 +283,6 @@ Now we can provision our OLT:
 (voltha) preprovision_olt -t asfvolt16_olt -H <olt_mgmt_ip>:59991
 success (device id = 0001f6f4595fdc93)
 
-enable <olt_id>
 (voltha) enable 0001f6f4595fdc93
 enabling 0001f6f4595fdc93
 waiting for device to be enabled...
@@ -290,32 +296,33 @@ minutes. During this time you should see logs scrolling by in the
 device to be enabled" message will stop once the device has finished being
 provisioned.
 
-Next, add the OLT and ONU configuration. The following is a series of
+Next, add the OLT configuration. The following is a series of
 commands that need to be entered into the VOLTHA CLI in order to configure
-an OLT and ONU. Note that two values will need to be adapted
-to your deployment. The first value (`0001bb590711de28`) is the device ID
-of the device in VOLTHA, and the second value (`BRCM12345678`) is the
-serial number of the ONU.
+an OLT and ONU. Pay attention to the device ID in the channel termination command,
+(`0001bb590711de28`) as this will need to be changed to match your OLT's device ID.
 
 ```
-xpon
-channel_group create -n "Manhattan" -d "Channel Group for Manhattan" -a up -p 100 -s 000000 -r raman_none
-channel_partition create -n "WTC" -d "Channel Partition for World Trade Center in Manhattan" -a up -r 20 -o 0 -f false -m false -u serial_number -c "Manhattan"
-channel_pair create -n "PON port" -d "Channel Pair for Freedom Tower in WTC" -a up -r down_10_up_10 -t channelpair -g "Manhattan" -p "WTC" -i 0 -o class_a
-traffic_descriptor_profile create -n "TDP 1" -f 100000 -a 500000 -m 1000000 -p 1 -w 1 -e additional_bw_eligibility_indicator_none
-channel_termination create -i 0001bb590711de28 -n "PON port" -d "Channel Termination for Freedom Tower" -a up -r "PON port" -c "AT&T WTC OLT"
+(voltha) xpon
+(voltha-xpon ) channel_group create -n "Manhattan" -d "Channel Group for Manhattan" -a up -p 100 -s 000000 -r raman_none
+(voltha-xpon ) channel_partition create -n "WTC" -d "Channel Partition for World Trade Center in Manhattan" -a up -r 20 -o 0 -f false -m false -u serial_number -c "Manhattan"
+(voltha-xpon ) channel_pair create -n "PON port" -d "Channel Pair for Freedom Tower in WTC" -a up -r (voltha-xpon ) down_10_up_10 -t channelpair -g "Manhattan" -p "WTC" -i 0 -o class_a
+(voltha-xpon ) traffic_descriptor_profile create -n "TDP 1" -f 100000 -a 500000 -m 1000000 -p 1 -w 1 -e additional_bw_eligibility_indicator_none
+(voltha-xpon ) channel_termination create -i 0001bb590711de28 -n "PON port" -d "Channel Termination for Freedom Tower" -a up -r "PON port" -c "AT&T WTC OLT"
+```
+Then for every ONU that you want to bring up, run the following commands in the VOLTHA CLI.
+The value of the ONU serial number (`BRCM12345678`) needs to be changed to match your
+ONU's serial number.
 
-# Wait for 5 sec for PON interface up 
-vont_ani create -n "ATT Golden User" -d "ATT Golden User in Freedom Tower" -a up -p "WTC" -s "BRCM12345678" -r "PON port" -o 1
-#echo 8 > /sys/class/net/bronu513/bridge/group_fwd_mask 
+```
+(voltha-xpon ) vont_ani create -n "ATT Golden User" -d "ATT Golden User in Freedom Tower" -a up -p "WTC" -s "BRCM12345678" -r "PON port" -o 1
 
-# Wait for 5 Sec for ONT to come up
-ont_ani create -n "ATT Golden User" -d "ATT Golden User in Freedom Tower" -a up -u true -m false
-tcont create -n "TCont 1" -r "ATT Golden User" -t "TDP 1"
+# Wait for 5 sec for ONT to come up
+(voltha-xpon ) ont_ani create -n "ATT Golden User" -d "ATT Golden User in Freedom Tower" -a up -u true -m false
+(voltha-xpon ) tcont create -n "TCont 1" -r "ATT Golden User" -t "TDP 1"
 
-#Wait for 5 sec for scheduler configuration to finish.
-v_enet create -n "Enet UNI 1" -d "Ethernet port - 1" -a up -r "ATT Golden User"
-gem_port create -n "Gemport 1" -r "Enet UNI 1" -c 2 -a true -t "TCont 1"
+# Wait for 5 sec for scheduler configuration to finish.
+(voltha-xpon ) v_enet create -n "Enet UNI 1" -d "Ethernet port - 1" -a up -r "ATT Golden User"
+(voltha-xpon ) gem_port create -n "Gemport 1" -r "Enet UNI 1" -c 2 -a true -t "TCont 1"
 ```
 
 At this point the ONU should have been provisioned and ready to have its
@@ -330,7 +337,7 @@ take these flow rules and configure the PON accordingly.
 On the node where VOLTHA is running, you can access the ONOS CLI using:
 
 ```
-ssh karaf@localhost -p 8101           #password=karaf
+$ ssh karaf@localhost -p 8101           #password=karaf
 ```
 
 In the previous step we already provisioned VOLTHA with an OLT, so it should
@@ -345,7 +352,7 @@ onos> ports
 id=of:0001000000000001, available=true, local-status=connected 34m45s ago, role=MASTER, type=SWITCH, mfr=cord project, hw=n/a, sw=logical device for Edgecore ASFvOLT16 OLT, serial=10.6.0.199:59991, driver=pmc-olt, channelId=172.25.0.1:55015, locType=geo, managementAddress=172.25.0.1, name=of:0001000000000001, protocol=OF_13
   port=21, state=enabled, type=fiber, speed=0 , portName=Enet UNI 1, portMac=00:00:00:01:00:15
   port=129, state=enabled, type=fiber, speed=0 , portName=nni, portMac=00:00:00:00:00:81
-  ```
+```
 
 If this is all correct, then the final step is to use the ONOS CLI to provision subscriber VLANs on the PON:
 
@@ -358,3 +365,13 @@ If all is going well, traffic should be able to flow through the PON, to the vSG
 and out to the Internet. If you place a client behind the ONU it should be able to
 DHCP and get an address from the vSG, then reach the Internet using the vSG
 as its default gateway.
+
+## Troubleshooting
+
+If you ever need to reset the system, then you can stop VOLTHA like this:
+
+```
+$ ./run-voltha.sh stop
+```
+
+Then reboot the OLT to ensure that it is in a fresh state to be reprovisioned.
