@@ -22,6 +22,30 @@
       "revId": "04c5f2d647d7e3edfffbb1b9fe71c11e2126abd5",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c70d88c6_b0487bfd",
+        "filename": "docs/voltha_install.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1000005
+      },
+      "writtenOn": "2018-03-28T18:41:32Z",
+      "side": 1,
+      "message": "Do we need to update this on the cord-5.0 branch or will the current command work in 5.0?",
+      "parentUuid": "6f491eb5_3dbcc06b",
+      "range": {
+        "startLine": 170,
+        "startChar": 0,
+        "endLine": 170,
+        "endChar": 126
+      },
+      "revId": "04c5f2d647d7e3edfffbb1b9fe71c11e2126abd5",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
