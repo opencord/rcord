@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2b6ddd07_106b66a9",
+        "filename": "xos/synchronizer/models/rcord.xproto",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000005
+      },
+      "writtenOn": "2018-04-11T13:39:57Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this field be on the OLT, not the subscriber?",
+      "revId": "f5a8cf9200a537b06b661b0afbabc31b21d93e91",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
