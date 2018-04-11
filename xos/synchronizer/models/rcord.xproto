@@ -24,6 +24,5 @@ message CordSubscriberRoot (ServiceInstance) {
 
     optional int32 uni_port_id = 16 [help_text = "UNI PORT ID in VOLTHA", null = True, db_index = False, blank = False];
     optional string ip_address = 17 [help_text = "Subscriber IP Address", null = False, db_index = False, blank = False];
-    optional string switch_datapath_id = 18 [help_text = "Fabric switch to which the OLT is connected", null = False, db_index = False, blank = False];
-
+    optional string mac_address = 18 [null = False, db_index = False, blank = False];
 }
