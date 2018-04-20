@@ -1,46 +1,48 @@
 # Installing VOLTHA
 
-The following describes how to install VOLTHA (configured
-with the EdgeCore OLT device) into R-CORD.
+The following describes how to install VOLTHA (configured with the EdgeCore OLT
+device) into R-CORD.
 
-> Note: VOLTHA is not officially included in the release, but it can
-> be configured manually, as described below.
+> Note: VOLTHA is not officially included in the release, but it can be
+> configured manually, as described below.
 
 ## Prerequisites
 
 The starting point is a physical CORD POD with the `rcord` profile, at which
 point the manual fabric configuration steps outlined below can be performed.
-Make sure your fabric has Internet access (i.e., `vRouter` has been configured).
+Make sure your fabric has Internet access (i.e., `vRouter` has been
+configured).
 
-The ONOS cluster controlling the fabric is located on the CORD head node.
-We will deploy VOLTHA and a separate single-instance ONOS cluster for running
-the OLT control apps on one of the CORD compute nodes. It doesn’t matter
-which compute node is used at this stage, given that we are communicating
-with the OLT out-of-band over the management network.
+The ONOS cluster controlling the fabric is located on the CORD head node.  We
+will deploy VOLTHA and a separate single-instance ONOS cluster for running the
+OLT control apps on one of the CORD compute nodes. It doesn’t matter which
+compute node is used at this stage, given that we are communicating with the
+OLT out-of-band over the management network.
 
 In R-CORD, each PON is identified by a subscriber VLAN tag, and each customer
 on a PON is identified by a customer VLAN tag. You will need to decide on an
-`s-tag` for the OLT and a `c-tag` for each subscriber that you want to provision.
+`s-tag` for the OLT and a `c-tag` for each subscriber that you want to
+provision.
 
-You will also need to take note of the OpenFlow port numbers of the fabric switch
-port where the OLT is connected, as well as the fabric switch port where your
-compute node is connected. These port numbers are needed for fabric configuration
-later on.
+You will also need to take note of the OpenFlow port numbers of the fabric
+switch port where the OLT is connected, as well as the fabric switch port where
+  your compute node is connected. These port numbers are needed for fabric
+  configuration later on.
 
-> Note: Currently there is a restriction that the OLT and the node hosting the vSG
-> serving the customers on that OLT need to be attached to the same fabric leaf.
-> In a small 1-node/1-switch setup this will obviously be the case, but if running
-> on a larger setup it is necessary to be aware of the fact that vSG placement is
-> constrained.
+> Note: Currently there is a restriction that the OLT and the node hosting the
+> vSG serving the customers on that OLT need to be attached to the same fabric
+> leaf.  In a small 1-node/1-switch setup this will obviously be the case, but
+> if running on a larger setup it is necessary to be aware of the fact that vSG
+> placement is constrained.
 
 ## Bring Up OLT Device
 
 Install the OLT in your POD. Connect the 1G copper Ethernet port to the
-management switch, and connect the top left NNI uplink to one of your
-fabric leaf switches.
+management switch, and connect the top left NNI uplink to one of your fabric
+leaf switches.
 
-In CORD 5.0, the EdgeCore ASFvOLT16 OLT is able to PXE boot and have its
-OS image automatically installed. Once the OLT is connected to the management
+In CORD 5.0, the EdgeCore ASFvOLT16 OLT is able to PXE boot and have its OS
+image automatically installed. Once the OLT is connected to the management
 network, start the OLT in ONIE boot mode and the CORD automation will will take
 it from there.
 
@@ -58,7 +60,7 @@ until we have clearance to distribute this software.
 
 Assuming you have the software, then simply copy it over to the OLT and install it:
 
-```
+```shell
 scp bal.deb root@<olt_mgmt_ip>:
 ssh root@<olt_mgmt_ip>                #password: onl
 dpkg -i bal.deb
@@ -76,7 +78,7 @@ then you need to downgrade the speed of the NNI port on the OLT.
 On the OLT box itself, edit the file `/broadcom/qax.soc`. Find the lines with
 `port …` and add the following line underneath:
 
-```
+```cfg
 port ce128 sp=40000
 ```
 
@@ -84,11 +86,7 @@ Then reboot your OLT.
 
 ## Bring Up a vSG Instance
 
-Browse to the XOS UI in a web browser:
-
-```
-http://<head_node_ip>/xos
-```
+Browse to the XOS UI in a web browser: `http://<head_node_ip>/xos`
 
 Log in with your admin credentials.
 
@@ -112,23 +110,24 @@ internet in order to fully come up.
 
 ## Configure Fabric ONOS
 
-Once an OLT has been connected to the fabric, the fabric needs some configuration
-to forward the data traffic from the OLT to the right compute node running the vSGs.
-All vSGs serving customers on a particular PON will be located on the same compute node.
+Once an OLT has been connected to the fabric, the fabric needs some
+configuration to forward the data traffic from the OLT to the right compute
+node running the vSGs.  All vSGs serving customers on a particular PON will be
+located on the same compute node.
 
 Recall that the fabric controller ONOS is located on the HEAD node The steps in
 this section are done on the CORD head node.
 
 The file `/opt/cord_profile/fabric-network-cfg.json` should contain the base
-fabric network configuration that you created earlier. In this step we will edit this
-file to add some additional configuration to add a tagged VLAN on two fabric switch
-ports: the port facing the OLT, and the port facing the compute node where
-the vSGs will be hosted.
+fabric network configuration that you created earlier. In this step we will
+edit this file to add some additional configuration to add a tagged VLAN on two
+fabric switch ports: the port facing the OLT, and the port facing the compute
+node where the vSGs will be hosted.
 
-Create a new section in the `ports` section for the port facing your OLT.
-For example:
+Create a new section in the `ports` section for the port facing your OLT.  For
+example:
 
-```
+```json
 ...
 “ports” {
     …
@@ -144,10 +143,10 @@ For example:
 ```
 
 The port facing your compute node will already have an interface config from
-the earlier provisioning of the fabric. We now need to add a new interface config
-under the same existing port config for the data traffic from the OLT:
+the earlier provisioning of the fabric. We now need to add a new interface
+config under the same existing port config for the data traffic from the OLT:
 
-```
+```json
 ...
 "of:0000cc37ab6180ca/5": {
     "interfaces": [
@@ -166,21 +165,21 @@ under the same existing port config for the data traffic from the OLT:
 Run the following command on the head node to refresh the config in
 ONOS:
 
-```
-$ curl -H "xos-username: xosadmin@opencord.org" -H "xos-password: `cat /opt/credentials/xosadmin@opencord.org`" -X POST --data-binary @/opt/cord_profile/fabric-service.yaml http://localhost:9102/xos-tosca/run
+```shell
+curl -H "xos-username: xosadmin@opencord.org" -H "xos-password: `cat /opt/credentials/xosadmin@opencord.org`" -X POST --data-binary @/opt/cord_profile/fabric-service.yaml http://localhost:9102/xos-tosca/run
 ```
 
 Now it is best to log in to the fabric ONOS and verify that the config was
 received properly:
 
-```
-$ ssh karaf@localhost -p 8101      #password=karaf
+```shell
+ssh karaf@localhost -p 8101      #password=karaf
 ```
 
 Run the `interfaces` command and verify that your new `vlanTagged`
 interfaces are there:
 
-```
+```shell
 onos> interfaces
 ...
 (unamed): port=of:0000cc37ab6180ca/5 vlanTagged=[300]
@@ -191,19 +190,19 @@ onos> interfaces
 It’s also best to restart the segment routing app to make sure it picks up the
 new config:
 
-```
+```shell
 onos> app deactivate org.onosproject.segmentrouting
 onos> app activate org.onosproject.segmentrouting
 ```
 
 ## Run VOLTHA and ONOS
 
-VOLTHA comes with a Docker stack file that runs a full single-node ensemble
-of VOLTHA. This means we will run a single copy of all the VOLTHA containers,
-plus a single copy of all the infrastructure services that VOLTHA needs to run
-(e.g., consul, kafka, zookeeper, fluentd, etc). The stack file will also run an ONOS
-instance that we will use to control the logical OpenFlow device that VOLTHA
-exposes.
+VOLTHA comes with a Docker stack file that runs a full single-node ensemble of
+VOLTHA. This means we will run a single copy of all the VOLTHA containers, plus
+a single copy of all the infrastructure services that VOLTHA needs to run
+(e.g., consul, kafka, zookeeper, fluentd, etc). The stack file will also run an
+ONOS instance that we will use to control the logical OpenFlow device that
+VOLTHA exposes.
 
 ### Prepare ONOS Configuration
 
@@ -213,7 +212,7 @@ VOLTHA, and ONOS needs to be configured at system startup.
 
 Create a config file that looks like this in `~/network-cfg.json`
 
-```
+```json
 {
   "devices": {
     "of:0001000000000001": {
@@ -234,43 +233,43 @@ Create a config file that looks like this in `~/network-cfg.json`
 Prepare the node as a single-node docker swarm (substitute the dataplane IP
 address of the node on which you are running VOLTHA):
 
-```
-$ docker swarm init --advertise-addr 10.6.1.2
+```shell
+docker swarm init --advertise-addr 10.6.1.2
 ```
 
 ### Run a Released Version of VOLTHA
 
 Download the VOLTHA run script:
 
-```
-$ curl https://raw.githubusercontent.com/opencord/voltha/voltha-1.2/scripts/run-voltha.sh > run-voltha.sh
-$ chmod +x run-voltha.sh
+```shell
+curl https://raw.githubusercontent.com/opencord/voltha/voltha-1.2/scripts/run-voltha.sh > run-voltha.sh
+chmod +x run-voltha.sh
 ```
 
 Then you can start voltha like this:
 
-```
-$ ONOS_CONFIG=~/network-cfg.json REPOSITORY=voltha/ TAG=1.2.1 ./run-voltha.sh start
+```shell
+ONOS_CONFIG=~/network-cfg.json REPOSITORY=voltha/ TAG=1.2.1 ./run-voltha.sh start
 ```
 
 Now we have started a single-node VOLTHA stack. You can use the following
 command to see the various containers that are runnning as part of the stack:
 
-```
-$ docker stack ps voltha
+```shell
+docker stack ps voltha
 ```
 
 ## Provision the OLT + ONU
 
 Access VOLTHA's CLI with:
 
-```
-$ ssh voltha@localhost -p 5022
+```shell
+ssh voltha@localhost -p 5022
 ```
 
 Run the health command and verify you get this output:
 
-```
+```json
 (voltha) health
 {
     "state": "HEALTHY"
@@ -279,7 +278,7 @@ Run the health command and verify you get this output:
 
 Now we can provision our OLT:
 
-```
+```shell
 (voltha) preprovision_olt -t asfvolt16_olt -H <olt_mgmt_ip>:59991
 success (device id = 0001f6f4595fdc93)
 
@@ -296,12 +295,13 @@ minutes. During this time you should see logs scrolling by in the
 device to be enabled" message will stop once the device has finished being
 provisioned.
 
-Next, add the OLT configuration. The following is a series of
-commands that need to be entered into the VOLTHA CLI in order to configure
-an OLT and ONU. Pay attention to the device ID in the channel termination command,
-(`0001bb590711de28`) as this will need to be changed to match your OLT's device ID.
+Next, add the OLT configuration. The following is a series of commands that
+need to be entered into the VOLTHA CLI in order to configure an OLT and ONU.
+Pay attention to the device ID in the channel termination command,
+(`0001bb590711de28`) as this will need to be changed to match your OLT's device
+ID.
 
-```
+```shell
 (voltha) xpon
 (voltha-xpon ) channel_group create -n "Manhattan" -d "Channel Group for Manhattan" -a up -p 100 -s 000000 -r raman_none
 (voltha-xpon ) channel_partition create -n "WTC" -d "Channel Partition for World Trade Center in Manhattan" -a up -r 20 -o 0 -f false -m false -u serial_number -c "Manhattan"
@@ -309,11 +309,12 @@ an OLT and ONU. Pay attention to the device ID in the channel termination comman
 (voltha-xpon ) traffic_descriptor_profile create -n "TDP 1" -f 100000 -a 500000 -m 1000000 -p 1 -w 1 -e additional_bw_eligibility_indicator_none
 (voltha-xpon ) channel_termination create -i 0001bb590711de28 -n "PON port" -d "Channel Termination for Freedom Tower" -a up -r "PON port" -c "AT&T WTC OLT"
 ```
-Then for every ONU that you want to bring up, run the following commands in the VOLTHA CLI.
-The value of the ONU serial number (`BRCM12345678`) needs to be changed to match your
-ONU's serial number.
 
-```
+Then for every ONU that you want to bring up, run the following commands in the
+VOLTHA CLI.  The value of the ONU serial number (`BRCM12345678`) needs to be
+changed to match your ONU's serial number.
+
+```shell
 (voltha-xpon ) vont_ani create -n "ATT Golden User" -d "ATT Golden User in Freedom Tower" -a up -p "WTC" -s "BRCM12345678" -r "PON port" -o 1
 
 # Wait for 5 sec for ONT to come up
@@ -336,8 +337,8 @@ take these flow rules and configure the PON accordingly.
 
 On the node where VOLTHA is running, you can access the ONOS CLI using:
 
-```
-$ ssh karaf@localhost -p 8101           #password=karaf
+```shell
+ssh karaf@localhost -p 8101           #password=karaf
 ```
 
 In the previous step we already provisioned VOLTHA with an OLT, so it should
@@ -345,7 +346,7 @@ have automatically connected to this new ONOS instance. Running `devices`
 and `ports` should show one OLT device with two ports, an NNI port and a UNI
 port.
 
-```
+```shell
 onos> devices
 id=of:0001000000000001, available=true, local-status=connected 34m43s ago, role=MASTER, type=SWITCH, mfr=cord project, hw=n/a, sw=logical device for Edgecore ASFvOLT16 OLT, serial=10.6.0.199:59991, driver=pmc-olt, channelId=172.25.0.1:55015, locType=geo, managementAddress=172.25.0.1, name=of:0001000000000001, protocol=OF_13
 onos> ports
@@ -354,9 +355,10 @@ id=of:0001000000000001, available=true, local-status=connected 34m45s ago, role=
   port=129, state=enabled, type=fiber, speed=0 , portName=nni, portMac=00:00:00:00:00:81
 ```
 
-If this is all correct, then the final step is to use the ONOS CLI to provision subscriber VLANs on the PON:
+If this is all correct, then the final step is to use the ONOS CLI to provision
+subscriber VLANs on the PON:
 
-```
+```shell
 onos> add-subscriber-access <olt_dpid> <uni_port> <c_vlan>
 e.g., add-subscriber-access of:0001000000000001 21 400
 ```
@@ -370,8 +372,9 @@ as its default gateway.
 
 If you ever need to reset the system, then you can stop VOLTHA like this:
 
-```
-$ ./run-voltha.sh stop
+```shell
+./run-voltha.sh stop
 ```
 
 Then reboot the OLT to ensure that it is in a fresh state to be reprovisioned.
+
