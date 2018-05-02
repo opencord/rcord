@@ -114,6 +114,8 @@ topology_template:
         kind: rcord
         public_key: {{ lookup('file', config_cord_profile_dir + '/key_import/volt_rsa.pub') }}
         private_key_fn: /opt/xos/services/volt/keys/volt_rsa
+        voltha_url: http://does.not.exist/
+        p_onos_url: http://does.not.exist/
 
     volt_vsg:
       type: tosca.nodes.ServiceDependency
