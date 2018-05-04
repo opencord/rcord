@@ -1,10 +1,16 @@
 option name = "rcord";
 option app_label = "rcord";
-option verbose_name = "RCORD Subscriber";
 option legacy="True";
 
-message CordSubscriberRoot (ServiceInstance) {
-    option kind = "CordSubscriberRoot";
+message RCORDService (Service) {
+    option verbose_name = "RCORD Service";
+    required string access = 11 [help_text = "Who is managing the Access Network", default = "voltha", choices = "(('voltha', 'VOLTHA'),)", max_length = 30, blank = False, null = False, db_index = False];
+}
+
+message RCORDSubscriber (ServiceInstance) {
+    option kind = "RCORDSubscriber";
+    option verbose_name = "RCORD Subscriber";
+    option owner_class_name = "RCORDService";
 
     required bool firewall_enable = 1 [default = False, null = False, db_index = False, blank = True];
     optional string firewall_rules = 2 [default = "accept all anywhere anywhere", null = True, db_index = False, blank = True];
@@ -23,6 +29,6 @@ message CordSubscriberRoot (ServiceInstance) {
     optional manytoone creator->User:created_rcord_subscribers = 15 [db_index = True, null = True, blank = True];
 
     optional int32 uni_port_id = 16 [help_text = "UNI PORT ID in VOLTHA", null = True, db_index = False, blank = False];
-    optional string ip_address = 17 [help_text = "Subscriber IP Address", null = False, db_index = False, blank = False];
-    optional string mac_address = 18 [null = False, db_index = False, blank = False];
+    optional string ip_address = 17 [help_text = "Subscriber IP Address", null = True, db_index = False, blank = False];
+    optional string mac_address = 18 [null = True, db_index = False, blank = False];
 }

@@ -17,7 +17,7 @@ from synchronizers.new_base.modelaccessor import ServiceInstanceLink, model_acce
 from synchronizers.new_base.policy import Policy
 
 class RCORDSubscriberPolicy(Policy):
-    model_name = "CordSubscriberRoot"
+    model_name = "RCORDSubscriber"
 
     def handle_create(self, si):
         return self.handle_update(si)
@@ -28,7 +28,7 @@ class RCORDSubscriberPolicy(Policy):
 
         # Already has a chain
         if len(chain) > 0 and not si.is_new:
-            self.logger.debug("MODEL_POLICY: Subscriber %s is already part of a chain" % si.id)
+            self.logger.debug("MODEL_POLICY: RCORDSubscriber %s is already part of a chain" % si.id)
             return
 
         # if it does not have a chain,
@@ -40,7 +40,7 @@ class RCORDSubscriberPolicy(Policy):
         for link in links:
             ps = link.provider_service.leaf_model
             si_class = link.provider_service.get_service_instance_class_name()
-            self.logger.info("MODEL_POLICY: RCORDSubscriberRoot %s creating %s" % (si, si_class))
+            self.logger.info("MODEL_POLICY: RCORDSubscriber %s creating %s" % (si, si_class))
 
             eastbound_si_class = model_accessor.get_model_class(si_class)
             eastbound_si = eastbound_si_class()
