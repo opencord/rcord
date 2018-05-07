@@ -115,7 +115,7 @@ topology_template:
         public_key: {{ lookup('file', config_cord_profile_dir + '/key_import/volt_rsa.pub') }}
         private_key_fn: /opt/xos/services/volt/keys/volt_rsa
         voltha_url: http://does.not.exist/
-        p_onos_url: http://does.not.exist/
+        onos_voltha_url: http://does.not.exist/
 
     volt_vsg:
       type: tosca.nodes.ServiceDependency
@@ -201,10 +201,6 @@ topology_template:
       type: tosca.nodes.VRouterService
       properties:
         name: vrouter
-        rest_hostname: onos-fabric.{{ site_suffix }}
-        rest_port: 8181
-        rest_user: onos
-        rest_pass: rocks
 
     vRouter_ONOS_app:
       type: tosca.nodes.ONOSApp
@@ -309,6 +305,7 @@ topology_template:
 {% endif %}
 
     # TODO: migrate interfaces when we'll start using them
+
     # in#lanside:
     #   type: tosca.nodes.InterfaceType
     #   properties:
