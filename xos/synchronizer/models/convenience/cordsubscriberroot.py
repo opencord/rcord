@@ -17,12 +17,12 @@
 import json
 from xosapi.orm import ORMWrapper, register_convenience_wrapper
 
-class ORMWrapperCordSubscriberRoot(ORMWrapper):
+class ORMWrapperRCORDSubscriber(ORMWrapper):
     @property
     def volt(self):
         links = self.subscribed_links.all()
         for link in links:
-            # TODO: hardcoded service dependency
+            # FIXME: hardcoded service dependency
             # cast from ServiceInstance to VOLTServiceInstance
             volts = self.stub.VOLTServiceInstance.objects.filter(id = link.provider_service_instance.id)
             if volts:
@@ -52,4 +52,4 @@ class ORMWrapperCordSubscriberRoot(ORMWrapper):
     def devices(self):
         return self.get_attribute("devices", [])
 
-register_convenience_wrapper("CordSubscriberRoot", ORMWrapperCordSubscriberRoot)
+register_convenience_wrapper("RCORDSubscriber", ORMWrapperRCORDSubscriber)

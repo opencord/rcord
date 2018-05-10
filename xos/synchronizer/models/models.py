@@ -12,12 +12,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import re
+import socket
 
-from xos.exceptions import *
-from models_decl import *
-from core.models import Service
+from xos.exceptions import XOSValidationError, XOSProgrammingError, XOSPermissionDenied
+from models_decl import RCORDService_decl, RCORDSubscriber_decl
 
-class CordSubscriberRoot(CordSubscriberRoot_decl):
+class RCORDService(RCORDService_decl):
+    class Meta:
+        proxy = True
+
+class RCORDSubscriber(RCORDSubscriber_decl):
     class Meta:
         proxy = True
 
@@ -37,26 +42,46 @@ class CordSubscriberRoot(CordSubscriberRoot_decl):
     def save(self, *args, **kwargs):
         self.validate_unique_service_specific_id(none_okay=True)
 
-        # NOTE setting owner_id
-        try:
-            rcord_service = Service.objects.filter(name="rcord")[0]
-            self.owner_id = rcord_service.id
-        except IndexError:
-            raise XOSValidationError("Service RCORD cannot be found, please make sure that the model exists.")
-
         # VSGServiceInstance will extract the creator from the Subscriber, as it needs a creator to create its
         # Instance.
         if not self.creator:
             # If we weren't passed an explicit creator, then we will assume the caller is the creator.
             if not getattr(self, "caller", None):
-                raise XOSProgrammingError("CordSubscriberRoot's self.caller was not set")
+                raise XOSProgrammingError("RCORDSubscriber's self.caller was not set")
             self.creator = self.caller
 
-        # TODO: What is this for?
         if (not hasattr(self, 'caller') or not self.caller.is_admin):
             if (self.has_field_changed("service_specific_id")):
                 raise XOSPermissionDenied("You do not have permission to change service_specific_id")
 
-        super(CordSubscriberRoot, self).save(*args, **kwargs)
+        # validate IP Address
+        if hasattr(self, 'ip_address') and self.ip_address is not None:
+            try:
+                socket.inet_aton(self.ip_address)
+            except socket.error:
+                raise XOSValidationError("The ip_address you specified (%s) is not valid" % self.ip_address)
+
+        # validate MAC Address
+        if hasattr(self, 'mac_address') and self.mac_address is not None:
+            if not re.match("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", self.mac_address.lower()):
+                raise XOSValidationError("The mac_address you specified (%s) is not valid" % self.mac_address)
+
+        if self.owner.leaf_model.access == "voltha":
+            # if the access network is managed by voltha, validate that olt_device and olt_port actually exists
+            volt_service = self.owner.provider_services[0].leaf_model # we assume RCORDService is connected only to the vOLTService
+
+            try:
+                olt_device = [d for d in volt_service.volt_devices.all() if d.name == self.olt_device][0]
+            except IndexError, e:
+                raise XOSValidationError("The olt_device you specified (%s) does not exists" % self.olt_device)
+
+            try:
+                olt_port = [p for p in olt_device.ports.all() if p.name == self.olt_port][0]
+            except IndexError, e:
+                raise XOSValidationError("The olt_port you specified (%s) does not exists on OLTDevice %s" % (self.olt_port, olt_device.name))
+
+
+
+        super(RCORDSubscriber, self).save(*args, **kwargs)
         self.invalidate_related_objects()
         return
