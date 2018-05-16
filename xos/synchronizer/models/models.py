@@ -23,6 +23,7 @@ class RCORDService(RCORDService_decl):
         proxy = True
 
 class RCORDSubscriber(RCORDSubscriber_decl):
+
     class Meta:
         proxy = True
 
@@ -66,7 +67,9 @@ class RCORDSubscriber(RCORDSubscriber_decl):
             if not re.match("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", self.mac_address.lower()):
                 raise XOSValidationError("The mac_address you specified (%s) is not valid" % self.mac_address)
 
-        if self.owner.leaf_model.access == "voltha":
+        self.set_owner()
+
+        if self.owner.access == "voltha":
             # if the access network is managed by voltha, validate that olt_device and olt_port actually exists
             volt_service = self.owner.provider_services[0].leaf_model # we assume RCORDService is connected only to the vOLTService
 
