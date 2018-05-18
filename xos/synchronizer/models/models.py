@@ -70,20 +70,20 @@ class RCORDSubscriber(RCORDSubscriber_decl):
         self.set_owner()
 
         if hasattr(self.owner.leaf_model, "access") and self.owner.leaf_model.access == "voltha":
-            # if the access network is managed by voltha, validate that olt_device and olt_port actually exists
+            # if the access network is managed by voltha, validate that onu_device actually exist
             volt_service = self.owner.provider_services[0].leaf_model # we assume RCORDService is connected only to the vOLTService
 
             try:
-                olt_device = [d for d in volt_service.volt_devices.all() if d.name == self.olt_device][0]
+                olt_devices = volt_service.volt_devices.all()
+                pon_ports = []
+                for olt in olt_devices:
+                    pon_ports = pon_ports + [p for p in olt.ports.all()]
+                onus = []
+                for port in pon_ports:
+                    onus = onus + [o for o in port.onu_devices.all()]
+                onu_device = [d for d in onus if d.serial_number == self.onu_device][0]
             except IndexError, e:
-                raise XOSValidationError("The olt_device you specified (%s) does not exists" % self.olt_device)
-
-            try:
-                olt_port = [p for p in olt_device.ports.all() if p.name == self.olt_port][0]
-            except IndexError, e:
-                raise XOSValidationError("The olt_port you specified (%s) does not exists on OLTDevice %s" % (self.olt_port, olt_device.name))
-
-
+                raise XOSValidationError("The onu_device you specified (%s) does not exists" % self.onu_device)
 
         super(RCORDSubscriber, self).save(*args, **kwargs)
         self.invalidate_related_objects()
