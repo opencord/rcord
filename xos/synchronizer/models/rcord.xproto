@@ -24,8 +24,7 @@ message RCORDSubscriber (ServiceInstance) {
     required bool enable_uverse = 10 [default = True, null = False, db_index = False, blank = True];
     required string status = 11 [default = "enabled", choices = "(('enabled', 'Enabled'), ('suspended', 'Suspended'), ('delinquent', 'Delinquent'), ('copyrightviolation', 'Copyright Violation'))", max_length = 30, content_type = "stripped", blank = False, null = False, db_index = False];
     optional int32 c_tag = 12 [null = True, db_index = False, blank = False];
-    required string olt_device = 13 [help_text = "OLTDevice name", null = False, db_index = False, blank = False];
-    required string olt_port = 14 [help_text = "OLTDevicePort name", null = False, db_index = False, blank = False];
+    required string onu_device = 13 [help_text = "ONUDevice serial number", null = False, db_index = False, blank = False, unique = True];
     optional manytoone creator->User:created_rcord_subscribers = 15 [db_index = True, null = True, blank = True];
 
     optional int32 uni_port_id = 16 [help_text = "UNI PORT ID in VOLTHA", null = True, db_index = False, blank = False];
