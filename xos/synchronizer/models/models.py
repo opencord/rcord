@@ -14,6 +14,7 @@
 # limitations under the License.
 import re
 import socket
+import random
 
 from xos.exceptions import XOSValidationError, XOSProgrammingError, XOSPermissionDenied
 from models_decl import RCORDService_decl, RCORDSubscriber_decl
@@ -40,7 +41,19 @@ class RCORDSubscriber(RCORDSubscriber_decl):
                 inner_service_instance = link.provider_service_instance
                 inner_service_instance.save(update_fields=["updated"])
 
+    def generate_tag(self):
+        # NOTE this method will loop if available c_tags are ended
+        tag = random.randint(16, 4096)
+        if tag in self.get_used_c_tags():
+            return self.generate_tag()
+        return tag
+
+    def get_used_c_tags(self):
+        same_onu_subscribers = RCORDSubscriber.objects.filter(onu_device=self.onu_device)
+        return [s.c_tag for s in same_onu_subscribers]
+
     def save(self, *args, **kwargs):
+
         self.validate_unique_service_specific_id(none_okay=True)
 
         # VSGServiceInstance will extract the creator from the Subscriber, as it needs a creator to create its
@@ -67,9 +80,18 @@ class RCORDSubscriber(RCORDSubscriber_decl):
             if not re.match("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", self.mac_address.lower()):
                 raise XOSValidationError("The mac_address you specified (%s) is not valid" % self.mac_address)
 
+        # validate c_tag
+        if hasattr(self, 'c_tag') and self.c_tag is not None:
+            if self.c_tag in self.get_used_c_tags():
+                raise XOSValidationError("The c_tag you specified (%s) has already been used on device %s" % (self.c_tag, self.onu_device))
+
+        if not hasattr(self, "c_tag") or self.c_tag is None:
+            self.c_tag = self.generate_tag()
+
         self.set_owner()
 
         if hasattr(self.owner.leaf_model, "access") and self.owner.leaf_model.access == "voltha":
+
             # if the access network is managed by voltha, validate that onu_device actually exist
             volt_service = self.owner.provider_services[0].leaf_model # we assume RCORDService is connected only to the vOLTService
 

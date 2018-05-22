@@ -14,104 +14,89 @@
 
 
 import unittest
-from mock import patch, MagicMock
-import mock
-from xosconfig import Config
+from mock import patch, Mock
+
 
 import os, sys
 
-cwd=os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-xos_dir=os.path.abspath(os.path.join(cwd, "../../../../../../orchestration/xos/xos"))
-services_dir=os.path.join(xos_dir, "../../xos_services")
-config_file = os.path.join(cwd, "test_config.yaml")
+test_path=os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+service_dir=os.path.join(test_path, "../../../..")
+xos_dir=os.path.join(test_path, "../../..")
+if not os.path.exists(os.path.join(test_path, "new_base")):
+    xos_dir=os.path.join(test_path, "../../../../../../orchestration/xos/xos")
+    services_dir=os.path.join(xos_dir, "../../xos_services")
 
-# NOTE this have to start for xos_services
-RCORD_XPROTO = "../profiles/rcord/xos/synchronizer/models/rcord.xproto"
-
-Config.clear()
-Config.init(config_file, 'synchronizer-config-schema.yaml')
-
-# FIXME move the synchronizer framework into a library
-sys.path.append(xos_dir)
-from synchronizers.new_base.mock_modelaccessor_build import build_mock_modelaccessor
-
-class MockSubscriber:
-
-    def __init__(self, *args, **kwargs):
-        self.name = kwargs['name']
-        self.is_new = True
-        self.id = 1
-
-    def subscribed_links(self):
-        pass
-
-class MockAll:
-    @staticmethod
-    def all():
-        pass
-
-class MockService:
-
-    def __init__(self):
-        self.subscribed_dependencies = MockAll
-
-
-class MockModel:
-    def __init__(self):
-        self.model_name = "VOLTService"
-
-class MockLeaf:
-    def __init__(self):
-        self.leaf_model = MockModel()
-
-class MockLink:
-    def __init__(self):
-        self.provider_service = MockLeaf()
+# While transitioning from static to dynamic load, the path to find neighboring xproto files has changed. So check
+# both possible locations...
+def get_models_fn(service_name, xproto_name):
+    name = os.path.join(service_name, "xos", xproto_name)
+    if os.path.exists(os.path.join(services_dir, name)):
+        return name
+    else:
+        name = os.path.join(service_name, "xos", "synchronizer", "models", xproto_name)
+        if os.path.exists(os.path.join(services_dir, name)):
+            return name
+    raise Exception("Unable to find service=%s xproto=%s" % (service_name, xproto_name))
 
 class TestModelPolicyRCORDSubscriber(unittest.TestCase):
     def setUp(self):
-        global model_accessor
 
-        self.original_sys_path = sys.path
+        self.sys_path_save = sys.path
+        sys.path.append(xos_dir)
+        sys.path.append(os.path.join(xos_dir, 'synchronizers', 'new_base'))
 
-        # Generate a fake model accessor (emulate the client library)
-        build_mock_modelaccessor(xos_dir, services_dir, [RCORD_XPROTO])
+        config = os.path.join(test_path, "../test_config.yaml")
+        from xosconfig import Config
+        Config.clear()
+        Config.init(config, 'synchronizer-config-schema.yaml')
+
+        from synchronizers.new_base.mock_modelaccessor_build import build_mock_modelaccessor
+        build_mock_modelaccessor(xos_dir, services_dir, [
+            get_models_fn("../profiles/rcord", "rcord.xproto"),
+            get_models_fn("olt-service", "volt.xproto") # in test create we spy on VOLTServiceInstance
+        ])
 
         import synchronizers.new_base.modelaccessor
-        from synchronizers.new_base.modelaccessor import model_accessor
-        from model_policy_rcordsubscriber import RCORDSubscriberPolicy
+        from model_policy_rcordsubscriber import RCORDSubscriberPolicy, model_accessor
+
+        from mock_modelaccessor import MockObjectList
 
         # import all class names to globals
         for (k, v) in model_accessor.all_model_classes.items():
             globals()[k] = v
 
-        # model_accessor.reset_all_object_stores()
+        # Some of the functions we call have side-effects. For example, creating a VSGServiceInstance may lead to creation of
+        # tags. Ideally, this wouldn't happen, but it does. So make sure we reset the world.
+        model_accessor.reset_all_object_stores()
 
-        # create base objects for testing
         self.policy = RCORDSubscriberPolicy()
+        self.si = Mock(name="myTestSubscriber")
 
     def tearDown(self):
-        sys.path = self.original_sys_path
+        sys.path = self.sys_path_save
 
-    @patch.object(MockSubscriber, 'subscribed_links', MockAll)
-    @patch.object(MockAll, 'all', MagicMock(return_value=['foo']))
     def test_update_and_do_nothing(self):
-        si = MockSubscriber(name="myTestSubscriber")
+        si = self.si
         si.is_new = False
+        si.subscribed_links.all.return_value = ["already", "have", "a", "chain"]
         self.policy.handle_create(si)
         # NOTE assert that no models are created
 
-    @patch.object(MockSubscriber, 'subscribed_links', MockAll)
-    @patch.object(MockAll, 'all', MagicMock(return_value=[MockLink]))
     def test_create(self):
-        si = MockSubscriber(name="myTestSubscriber")
-        owner = MockService()
+        volt = Mock()
+        volt.get_service_instance_class_name.return_value = "VOLTServiceInstance"
 
-        si.owner = owner
+        service_dependency = Mock()
+        service_dependency.provider_service = volt
 
-        with patch.object(owner.subscribed_dependencies, 'all', MagicMock(return_value=[MockLink()])), \
-             patch.object(VOLTServiceInstance, "save", autospec=True) as save_volt, \
+        si = self.si
+        si.is_new = True
+        si.subscribed_links.all.return_value = []
+        si.owner.subscribed_dependencies.all.return_value = [service_dependency]
+
+        with patch.object(VOLTServiceInstance, "save", autospec=True) as save_volt, \
              patch.object(ServiceInstanceLink, "save", autospec=True) as save_link:
+
             self.policy.handle_create(si)
             self.assertEqual(save_link.call_count, 1)
             self.assertEqual(save_volt.call_count, 1)
