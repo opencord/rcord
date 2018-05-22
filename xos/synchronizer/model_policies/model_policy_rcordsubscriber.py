@@ -38,7 +38,6 @@ class RCORDSubscriberPolicy(Policy):
         links = si.owner.subscribed_dependencies.all()
 
         for link in links:
-            ps = link.provider_service.leaf_model
             si_class = link.provider_service.get_service_instance_class_name()
             self.logger.info("MODEL_POLICY: RCORDSubscriber %s creating %s" % (si, si_class))
 
