@@ -50,8 +50,10 @@ class TestRCORDModels(unittest.TestCase):
         self.rcord_subscriber_class = RCORDSubscriber
 
         self.rcord_subscriber = RCORDSubscriber()
+        self.rcord_subscriber.id = None # this is a new model
+        self.rcord_subscriber.is_new = True
         self.rcord_subscriber.onu_device = "BRCM1234"
-        self.rcord_subscriber.c_tag = "111"
+        self.rcord_subscriber.c_tag = 111
         self.rcord_subscriber.ip_address = "1.1.1.1"
         self.rcord_subscriber.mac_address = "00:AA:00:00:00:01"
         self.rcord_subscriber.owner.leaf_model.access = "voltha"
@@ -96,7 +98,7 @@ class TestRCORDModels(unittest.TestCase):
         """
 
         s = Mock()
-        s.c_tag = "111"
+        s.c_tag = 111
         s.onu_device = "BRCM1234"
 
         self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = [s]
@@ -107,6 +109,36 @@ class TestRCORDModels(unittest.TestCase):
         self.assertEqual(e.exception.message, "The c_tag you specified (111) has already been used on device BRCM1234")
         self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
 
+    def test_validate_c_tag_on_update(self):
+        s = Mock()
+        s.c_tag = 111
+        s.onu_device = "BRCM1234"
+        s.id = 1
+
+        self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = [s]
+
+        self.rcord_subscriber.is_new = False
+        self.rcord_subscriber.id = 1
+        self.rcord_subscriber.save()
+
+        self.models_decl.RCORDSubscriber_decl.save.assert_called()
+
+    def test_validate_c_tag_on_update_fail(self):
+        s = Mock()
+        s.c_tag = 222
+        s.onu_device = "BRCM1234"
+        s.id = 2
+
+        self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = [s]
+
+        self.rcord_subscriber.id = 1
+        self.rcord_subscriber.is_new = False
+        self.rcord_subscriber.c_tag = 222
+        with self.assertRaises(Exception) as e:
+            self.rcord_subscriber.save()
+
+        self.assertEqual(e.exception.message, "The c_tag you specified (222) has already been used on device BRCM1234")
+        self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
 
     def test_generate_c_tag(self):
         s = Mock()
