@@ -82,7 +82,16 @@ class RCORDSubscriber(RCORDSubscriber_decl):
 
         # validate c_tag
         if hasattr(self, 'c_tag') and self.c_tag is not None:
-            if self.c_tag in self.get_used_c_tags():
+            is_update_with_same_tag = False
+
+            if not self.is_new:
+                # if it is an update, but the tag is the same, skip validation
+                existing = RCORDSubscriber.objects.filter(c_tag=self.c_tag)
+
+                if len(existing) > 0 and existing[0].c_tag == self.c_tag and existing[0].id == self.id:
+                    is_update_with_same_tag = True
+
+            if self.c_tag in self.get_used_c_tags() and not is_update_with_same_tag:
                 raise XOSValidationError("The c_tag you specified (%s) has already been used on device %s" % (self.c_tag, self.onu_device))
 
         if not hasattr(self, "c_tag") or self.c_tag is None:
