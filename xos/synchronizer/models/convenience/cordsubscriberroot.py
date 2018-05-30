@@ -36,10 +36,7 @@ class ORMWrapperRCORDSubscriber(ORMWrapper):
                        "cdn_enable",
                        "uplink_speed",
                        "downlink_speed",
-                       "enable_uverse",
                        "status")
-
-    # figure out what to do about "devices"... is it still needed?
 
     def get_attribute(self, name, default=None):
         if self.service_specific_attribute:
@@ -47,9 +44,5 @@ class ORMWrapperRCORDSubscriber(ORMWrapper):
         else:
             attributes = {}
         return attributes.get(name, default)
-
-    @property
-    def devices(self):
-        return self.get_attribute("devices", [])
 
 register_convenience_wrapper("RCORDSubscriber", ORMWrapperRCORDSubscriber)
