@@ -20,10 +20,8 @@ message RCORDSubscriber (ServiceInstance) {
     optional string url_filter_rules = 4 [default = "allow all", null = True, db_index = False, blank = True];
     optional string url_filter_level = 5 [default = "PG", max_length = 30, content_type = "stripped", blank = False, null = False, db_index = False];
     optional bool cdn_enable = 6 [default = False, null = False, db_index = False, blank = True];
-    optional bool is_demo_user = 7 [default = False, null = False, db_index = False, blank = True];
     optional int32 uplink_speed = 8 [default = 1000000000, null = False, db_index = False, blank = False];
     optional int32 downlink_speed = 9 [default = 1000000000, null = False, db_index = False, blank = False];
-    optional bool enable_uverse = 10 [default = True, null = False, db_index = False, blank = True];
     optional string status = 11 [default = "enabled", choices = "(('enabled', 'Enabled'), ('suspended', 'Suspended'), ('delinquent', 'Delinquent'), ('copyrightviolation', 'Copyright Violation'))", max_length = 30, content_type = "stripped", blank = False, null = False, db_index = False];
 
     // parameters for r-cord lite
