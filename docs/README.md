@@ -1,52 +1,45 @@
-# R-CORD Profile
+# R-CORD Service
 
-The R-CORD (Residential CORD) profile is `Official`.
+The RCORD Service represents the `Subscriber` in the service chain.
 
-## Service Manifest
+This service expect to be located at the beginning of the chain.
 
-R-CORD includes the following [service
-manifest](https://github.com/opencord/platform-install/blob/master/profile_manifests/rcord.yml):
+## Service configurations
 
-| Service        | Source Code         |
-|----------------|---------------|
-| vOLT           | https://github.com/opencord/olt |
-| vSG            | https://github.com/opencord/vsg |
-| vRouter        | https://github.com/opencord/vrouter |
-| vTR            | https://github.com/opencord/vtr |
-| ExampleService | https://github.com/opencord/exampleservice |
-| VTN            | https://github.com/opencord/vtn |
-| Fabric         | https://github.com/opencord/fabric |
-| OpenStack      | https://github.com/opencord/openstack |
-| ONOS           | https://github.com/opencord/onos-service |
+As now the only possible configuration is to define the kind of access service
+that sits next to it. The default (and the only one supported for now) is
+'VOLTHA'.
 
-## Model Extensions
+If the R-CORD Service is configured with `access=voltha` it expect that:
 
-R-CORD extends CORD's core models with the following model specification
-([rcord.xproto](https://github.com/opencord/rcord/blob/master/xos/rcord.xproto)),
-which represents the *subscriber* that anchors a chain of `ServiceInstances`:
+- it has only one `provider_service`
+- the `provider_service` exposes an API called `has_access_device(onu_serial_number)`
+  that returns a boolean (this is used to validate that the ONU the subscriber
+  is pointing to really exists)
 
-```python
-message CordSubscriberRoot (ServiceInstance) {
-    option kind = "CordSubscriberRoot";
+## RCORDSubscriber
 
-    required bool firewall_enable = 1 [default = False, null = False, db_index = False, blank = True];
-    optional string firewall_rules = 2 [default = "accept all anywhere anywhere", null = True, db_index = False, blank = True];
-    required bool url_filter_enable = 3 [default = False, null = False, db_index = False, blank = True];
-    optional string url_filter_rules = 4 [default = "allow all", null = True, db_index = False, blank = True];
-    required string url_filter_level = 5 [default = "PG", max_length = 30, content_type = "stripped", blank = False, null = False, db_index = False];
-    required bool cdn_enable = 6 [default = False, null = False, db_index = False, blank = True];
-    required bool is_demo_user = 7 [default = False, null = False, db_index = False, blank = True];
-    required int32 uplink_speed = 8 [default = 1000000000, null = False, db_index = False, blank = False];
-    required int32 downlink_speed = 9 [default = 1000000000, null = False, db_index = False, blank = False];
-    required bool enable_uverse = 10 [default = True, null = False, db_index = False, blank = True];
-    required string status = 11 [default = "enabled", choices = "(('enabled', 'Enabled'), ('suspended', 'Suspended'), ('delinquent', 'Delinquent'), ('copyrightviolation', 'Copyright Violation'))", max_length = 30, content_type = "stripped", blank = False, null = False, db_index = False];
-}
+The `RCORDSubscriber` model is the `ServiceInstance` of the `RCORDService`.
+This is an example TOSCA you can use to create one:
+
+```yaml
+tosca_definitions_version: tosca_simple_yaml_1_0
+imports:
+  - custom_types/rcordsubscriber.yaml
+description: Create a test subscriber
+topology_template:
+  node_templates:
+    #Activate the subscriber
+    my_house:
+      type: tosca.nodes.RCORDSubscriber
+      properties:
+        name: My House
+        onu_device: BRCM1234
+        mac_address: 90:E2:BA:82:FA:81
+        ip_address: 192.168.0.1
 ```
 
-## GUI Extensions
-
-R-CORD includes the following GUI extensions:
-
-* [vtr](https://github.com/opencord/vtr/tree/master/xos/gui)
-* [rcord](https://github.com/opencord/rcord/tree/master/xos/gui)
+> NOTE: an `onu_device` with the provided serial number must exists in the system.
+> For more informations about ONU Devices, please refer to the
+> [vOLTService](../olt-service/README.md) guide.
 
