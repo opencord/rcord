@@ -15,9 +15,6 @@
 
 
 name: rcord
-accessor:
-  username: xosadmin@opencord.org
-  password: "@/opt/xos/services/rcord/credentials/xosadmin@opencord.org"
 required_models:
   - RCORDService
   - RCORDSubscriber
@@ -25,3 +22,13 @@ dependency_graph: "/opt/xos/synchronizers/rcord/model-deps"
 sys_dir: "/opt/xos/synchronizers/rcord/sys"
 models_dir: "/opt/xos/synchronizers/rcord/models"
 model_policies_dir: "/opt/xos/synchronizers/rcord/model_policies"
+logging:
+  version: 1
+  handlers:
+    console:
+      class: logging.StreamHandler
+  loggers:
+    'multistructlog':
+      handlers:
+          - console
+      level: DEBUG
