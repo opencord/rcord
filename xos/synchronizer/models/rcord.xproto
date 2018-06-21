@@ -22,7 +22,7 @@ message RCORDSubscriber (ServiceInstance) {
     optional bool cdn_enable = 6 [default = False, null = False, db_index = False, blank = True];
     optional int32 uplink_speed = 8 [default = 1000000000, null = False, db_index = False, blank = False];
     optional int32 downlink_speed = 9 [default = 1000000000, null = False, db_index = False, blank = False];
-    optional string status = 11 [default = "enabled", choices = "(('enabled', 'Enabled'), ('suspended', 'Suspended'), ('delinquent', 'Delinquent'), ('copyrightviolation', 'Copyright Violation'))", max_length = 30, content_type = "stripped", blank = False, null = False, db_index = False];
+    optional string status = 11 [default = "enabled", choices = "(('enabled', 'Enabled'), ('disabled', 'Disabled'), ('pre-provisioned', 'Pre Provisioned'))", max_length = 30, content_type = "stripped", blank = False, null = False, db_index = False];
 
     // parameters for r-cord lite
     optional int32 c_tag = 12 [null = True, db_index = False, blank = False];
