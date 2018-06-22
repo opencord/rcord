@@ -24,6 +24,10 @@ class RCORDSubscriberPolicy(Policy):
 
     def handle_update(self, si):
 
+        if si.status == "pre-provisioned":
+            self.logger.debug("MODEL_POLICY: Skipping chain creation as RCORDSubscriber %s is in 'pre-provisioned' state" % si.id)
+            return
+
         chain = si.subscribed_links.all()
 
         # Already has a chain

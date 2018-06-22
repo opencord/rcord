@@ -75,12 +75,29 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
     def tearDown(self):
         sys.path = self.sys_path_save
 
+    def test_update_pre_provisione(self):
+        si = self.si
+        si.status = "pre-provisioned"
+        self.policy.handle_create(si)
+
+        with patch.object(VOLTServiceInstance, "save", autospec=True) as save_volt, \
+             patch.object(ServiceInstanceLink, "save", autospec=True) as save_link:
+
+            self.policy.handle_create(si)
+            self.assertEqual(save_link.call_count, 0)
+            self.assertEqual(save_volt.call_count, 0)
+
     def test_update_and_do_nothing(self):
         si = self.si
         si.is_new = False
         si.subscribed_links.all.return_value = ["already", "have", "a", "chain"]
-        self.policy.handle_create(si)
-        # NOTE assert that no models are created
+        
+        with patch.object(VOLTServiceInstance, "save", autospec=True) as save_volt, \
+             patch.object(ServiceInstanceLink, "save", autospec=True) as save_link:
+
+            self.policy.handle_create(si)
+            self.assertEqual(save_link.call_count, 0)
+            self.assertEqual(save_volt.call_count, 0)
 
     def test_create(self):
         volt = Mock()
