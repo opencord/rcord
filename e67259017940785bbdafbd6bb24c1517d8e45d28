@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fc000c8_54d0db71",
+        "filename": "docs/voltha_install.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2018-07-02T13:30:02Z",
+      "side": 1,
+      "message": "Should this be Kubernetes?",
+      "range": {
+        "startLine": 231,
+        "startChar": 25,
+        "endLine": 231,
+        "endChar": 30
+      },
+      "revId": "e67259017940785bbdafbd6bb24c1517d8e45d28",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6c582045_4108cdc9",
+        "filename": "docs/voltha_install.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1000009
+      },
+      "writtenOn": "2018-07-02T13:30:02Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 233,
+        "startChar": 41,
+        "endLine": 233,
+        "endChar": 46
+      },
+      "revId": "e67259017940785bbdafbd6bb24c1517d8e45d28",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
