@@ -217,10 +217,10 @@ Create a config file that looks like this in `~/network-cfg.json`
   "devices": {
     "of:0001000000000001": {
       "basic": {
-        "driver": "pmc-olt"
+        "driver": "voltha"
       },
       "accessDevice": {
-        "uplink": "129",
+        "uplink": "128",
         "vlan": "300"
       }
     }
@@ -348,11 +348,11 @@ port.
 
 ```shell
 onos> devices
-id=of:0001000000000001, available=true, local-status=connected 34m43s ago, role=MASTER, type=SWITCH, mfr=cord project, hw=n/a, sw=logical device for Edgecore ASFvOLT16 OLT, serial=10.6.0.199:59991, driver=pmc-olt, channelId=172.25.0.1:55015, locType=geo, managementAddress=172.25.0.1, name=of:0001000000000001, protocol=OF_13
+id=of:0001000000000001, available=true, local-status=connected 34m43s ago, role=MASTER, type=SWITCH, mfr=cord project, hw=n/a, sw=logical device for Edgecore ASFvOLT16 OLT, serial=10.6.0.199:59991, driver=voltha, channelId=172.25.0.1:55015, locType=geo, managementAddress=172.25.0.1, name=of:0001000000000001, protocol=OF_13
 onos> ports
-id=of:0001000000000001, available=true, local-status=connected 34m45s ago, role=MASTER, type=SWITCH, mfr=cord project, hw=n/a, sw=logical device for Edgecore ASFvOLT16 OLT, serial=10.6.0.199:59991, driver=pmc-olt, channelId=172.25.0.1:55015, locType=geo, managementAddress=172.25.0.1, name=of:0001000000000001, protocol=OF_13
-  port=21, state=enabled, type=fiber, speed=0 , portName=Enet UNI 1, portMac=00:00:00:01:00:15
-  port=129, state=enabled, type=fiber, speed=0 , portName=nni, portMac=00:00:00:00:00:81
+id=of:0001000000000001, available=true, local-status=connected 34m45s ago, role=MASTER, type=SWITCH, mfr=cord project, hw=n/a, sw=logical device for Edgecore ASFvOLT16 OLT, serial=10.6.0.199:59991, driver=voltha, channelId=172.25.0.1:55015, locType=geo, managementAddress=172.25.0.1, name=of:0001000000000001, protocol=OF_13
+  port=16, state=enabled, type=fiber, speed=0 , portName=Enet UNI 1, portMac=00:00:00:01:00:15
+  port=128, state=enabled, type=fiber, speed=0 , portName=nni, portMac=00:00:00:00:00:81
 ```
 
 If this is all correct, then the final step is to use the ONOS CLI to provision
@@ -360,7 +360,7 @@ subscriber VLANs on the PON:
 
 ```shell
 onos> add-subscriber-access <olt_dpid> <uni_port> <c_vlan>
-e.g., add-subscriber-access of:0001000000000001 21 400
+e.g., add-subscriber-access of:0001000000000001 16 400
 ```
 
 If all is going well, traffic should be able to flow through the PON, to the vSG
