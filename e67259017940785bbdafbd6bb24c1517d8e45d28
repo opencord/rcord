@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "2e31ad2a_139aca79",
+        "filename": "docs/voltha_install.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1000005
+      },
+      "writtenOn": "2018-07-02T15:13:58Z",
+      "side": 1,
+      "message": "This was my documentation for manually running VOLTHA around the CORD 5.0 timeframe. This is all obselete now (at least in the context of CORD) as we use helm charts on k8s.",
+      "parentUuid": "ab345e23_119c1fca",
+      "range": {
+        "startLine": 231,
+        "startChar": 25,
+        "endLine": 231,
+        "endChar": 30
+      },
+      "revId": "e67259017940785bbdafbd6bb24c1517d8e45d28",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6c582045_4108cdc9",
         "filename": "docs/voltha_install.md",
         "patchSetId": 1
