@@ -1,5 +1,5 @@
 # xosproject/xos-gui-extension-rcord-base
-FROM xosproject/xos-gui-builder:candidate as xos-rcord-base
+FROM xosproject/xos-gui-builder:1.0.0 as xos-rcord-base
 
 ENV CODE_SOURCE .
 ENV CODE_DEST /var/www
@@ -21,7 +21,7 @@ COPY ${CODE_SOURCE}/tslint.json ${CODE_DEST}/tslint.json
 RUN npm run build
 
 # xosproject/gui-extension-rcord
-FROM alpine:latest
+FROM alpine:3.7
 
 ENV VHOST /var/www/dist
 WORKDIR ${VHOST}
