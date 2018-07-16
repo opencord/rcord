@@ -13,7 +13,15 @@
 # limitations under the License.
 
 import unittest
+import os, sys
 from mock import patch, Mock, MagicMock
+
+test_path=os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+service_dir=os.path.join(test_path, "../../../..")
+xos_dir=os.path.join(test_path, "../../..")
+if not os.path.exists(os.path.join(test_path, "new_base")):
+    xos_dir=os.path.join(test_path, "../../../../../../orchestration/xos/xos")
+    services_dir=os.path.join(xos_dir, "../../xos_services")
 
 # mocking XOS exception, as they're based in Django
 class Exceptions:
@@ -26,6 +34,10 @@ class XOS:
 
 class TestRCORDModels(unittest.TestCase):
     def setUp(self):
+
+        self.sys_path_save = sys.path
+        sys.path.append(xos_dir)
+
         self.xos = XOS
 
         self.models_decl = Mock()
@@ -59,6 +71,8 @@ class TestRCORDModels(unittest.TestCase):
         self.rcord_subscriber.owner.leaf_model.access = "voltha"
         self.rcord_subscriber.owner.provider_services = [self.volt]
 
+    def tearDown(self):
+        sys.path = self.sys_path_save
 
     def test_save(self):
         self.rcord_subscriber.save()
