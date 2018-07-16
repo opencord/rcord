@@ -20,6 +20,8 @@ FROM xosproject/xos-synchronizer-base:2.0.0
 
 COPY xos/synchronizer /opt/xos/synchronizers/rcord
 COPY VERSION /opt/xos/synchronizers/rcord/
+COPY samples/auth_event_sample.py /opt/xos/synchronizers/rcord/
+COPY samples/auth_event_sample_fail.py /opt/xos/synchronizers/rcord/
 
 ENTRYPOINT []
 
