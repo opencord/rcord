@@ -22,6 +22,7 @@ dependency_graph: "/opt/xos/synchronizers/rcord/model-deps"
 sys_dir: "/opt/xos/synchronizers/rcord/sys"
 models_dir: "/opt/xos/synchronizers/rcord/models"
 model_policies_dir: "/opt/xos/synchronizers/rcord/model_policies"
+event_steps_dir: "/opt/xos/synchronizers/rcord/event_steps"
 logging:
   version: 1
   handlers:
