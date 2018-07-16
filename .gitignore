@@ -3,6 +3,6 @@
 
 .coverage
 htmlcov
+.coverage
 coverage.xml
 nose2-junit.xml
-
