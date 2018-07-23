@@ -64,10 +64,6 @@ class RCORDSubscriber(RCORDSubscriber_decl):
                 raise XOSProgrammingError("RCORDSubscriber's self.caller was not set")
             self.creator = self.caller
 
-        if (not hasattr(self, 'caller') or not self.caller.is_admin):
-            if (self.has_field_changed("service_specific_id")):
-                raise XOSPermissionDenied("You do not have permission to change service_specific_id")
-
         # validate IP Address
         if hasattr(self, 'ip_address') and self.ip_address is not None:
             try:
