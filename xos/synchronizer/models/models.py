@@ -41,11 +41,16 @@ class RCORDSubscriber(RCORDSubscriber_decl):
                 inner_service_instance = link.provider_service_instance
                 inner_service_instance.save(update_fields=["updated"])
 
-    def generate_tag(self):
+    def generate_s_tag(self):
+        # NOTE what's the right way to generate an s_tag?
+        tag = random.randint(16, 4096)
+        return tag
+
+    def generate_c_tag(self):
         # NOTE this method will loop if available c_tags are ended
         tag = random.randint(16, 4096)
         if tag in self.get_used_c_tags():
-            return self.generate_tag()
+            return self.generate_c_tag()
         return tag
 
     def get_used_c_tags(self):
@@ -91,7 +96,10 @@ class RCORDSubscriber(RCORDSubscriber_decl):
                 raise XOSValidationError("The c_tag you specified (%s) has already been used on device %s" % (self.c_tag, self.onu_device))
 
         if not hasattr(self, "c_tag") or self.c_tag is None:
-            self.c_tag = self.generate_tag()
+            self.c_tag = self.generate_c_tag()
+
+        if not hasattr(self, "s_tag") or self.s_tag is None:
+            self.s_tag = self.generate_s_tag()
 
         self.set_owner()
 

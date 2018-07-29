@@ -66,6 +66,7 @@ class TestRCORDModels(unittest.TestCase):
         self.rcord_subscriber.is_new = True
         self.rcord_subscriber.onu_device = "BRCM1234"
         self.rcord_subscriber.c_tag = 111
+        self.rcord_subscriber.s_tag = 222
         self.rcord_subscriber.ip_address = "1.1.1.1"
         self.rcord_subscriber.mac_address = "00:AA:00:00:00:01"
         self.rcord_subscriber.owner.leaf_model.access = "voltha"
@@ -168,6 +169,20 @@ class TestRCORDModels(unittest.TestCase):
         self.assertNotEquals(self.rcord_subscriber.c_tag, "111")
         self.assertGreater(self.rcord_subscriber.c_tag, 16)
         self.assertLess(self.rcord_subscriber.c_tag, 4097)
+
+    def test_generate_s_tag(self):
+        self.rcord_subscriber.c_tag = None
+
+        self.rcord_subscriber.save()
+
+        self.models_decl.RCORDSubscriber_decl.save.assert_called()
+        self.assertNotEqual(self.rcord_subscriber.s_tag, None)
+
+    def test_provisioned_s_stag(self):
+        self.rcord_subscriber.save()
+        self.models_decl.RCORDSubscriber_decl.save.assert_called()
+        self.assertEqual(self.rcord_subscriber.s_tag, 222)
+
 
 
 if __name__ == '__main__':
