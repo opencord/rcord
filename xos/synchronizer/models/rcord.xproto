@@ -17,8 +17,8 @@ message RCORDSubscriber (ServiceInstance) {
     optional string status = 11 [default = "enabled", choices = "(('enabled', 'Enabled'), ('disabled', 'Disabled'), ('pre-provisioned', 'Pre Provisioned'), ('awaiting-auth', 'Awaiting Authentication'), ('auth-failed', 'Authentication Failed'))", max_length = 30, content_type = "stripped", blank = False, null = False, db_index = False];
 
     // parameters for r-cord lite
-    optional int32 c_tag = 12 [null = True, db_index = False, blank = False];
-    optional int32 s_tag = 19 [null = True, db_index = False, blank = False];
+    optional int32 c_tag = 12 [null = True, db_index = False, blank = False, min_value = 0, max_value = 4096];
+    optional int32 s_tag = 19 [null = True, db_index = False, blank = False, min_value = 0, max_value = 4096];
     required string onu_device = 13 [help_text = "ONUDevice serial number", null = False, db_index = False, blank = False];
     optional string ip_address = 17 [help_text = "Subscriber IP Address", null = True, db_index = False, blank = False];
     optional string mac_address = 18 [null = True, db_index = False, blank = False];
