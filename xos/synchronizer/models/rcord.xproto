@@ -22,4 +22,8 @@ message RCORDSubscriber (ServiceInstance) {
     required string onu_device = 13 [help_text = "ONUDevice serial number", null = False, db_index = False, blank = False];
     optional string ip_address = 17 [help_text = "Subscriber IP Address", null = True, db_index = False, blank = False];
     optional string mac_address = 18 [null = True, db_index = False, blank = False];
+
+    // operator specific fields
+    optional string nas_port_id = 20 [db_index = False];
+    optional string circuit_id = 21 [db_index = False];
 }
