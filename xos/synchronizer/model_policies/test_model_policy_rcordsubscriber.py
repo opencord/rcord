@@ -99,7 +99,7 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
             self.assertEqual(save_link.call_count, 0)
             self.assertEqual(save_volt.call_count, 0)
 
-    def test_create(self):
+    def test_create_chain(self):
         volt = Mock()
         volt.get_service_instance_class_name.return_value = "VOLTServiceInstance"
 
@@ -117,6 +117,28 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
             self.policy.handle_create(si)
             self.assertEqual(save_link.call_count, 1)
             self.assertEqual(save_volt.call_count, 1)
+
+    def test_remove_chain(self):
+        volt = VOLTServiceInstance()
+        volt.name = "volt"
+
+        link = ServiceInstanceLink()
+        link.subscriber_service_instance= self.si
+        link.provider_service_instance = volt
+        link.provider_service_instance.leaf_model = volt
+
+
+        si = self.si
+        si.is_new = False
+        si.status = "awaiting-auth"
+        si.subscribed_links.all.return_value = [link]
+
+        with patch.object(VOLTServiceInstance, "delete", autospec=True) as delete_volt, \
+             patch.object(ServiceInstanceLink, "delete", autospec=True) as delete_link:
+
+            self.policy.handle_create(si)
+            self.assertEqual(delete_link.call_count, 1)
+            self.assertEqual(delete_volt.call_count, 1)
 
 
 if __name__ == '__main__':
