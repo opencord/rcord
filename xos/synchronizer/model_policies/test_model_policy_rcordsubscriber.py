@@ -108,6 +108,7 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
 
         si = self.si
         si.is_new = True
+        si.status = "enabled"
         si.subscribed_links.all.return_value = []
         si.owner.subscribed_dependencies.all.return_value = [service_dependency]
 

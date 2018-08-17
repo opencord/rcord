@@ -42,22 +42,25 @@ class RCORDSubscriberPolicy(Policy):
                     link.provider_service_instance.leaf_model.delete()
 
         else:
-            self.logger.debug("MODEL_POLICY: creating RCORDSubscriber chain for %s" % si.id, status=si.status)
-            # if it does not have a chain,
-            # Find links to the next element in the service chain
-            # and create one
-            links = si.owner.subscribed_dependencies.all()
+            if si.status != "enabled":
+                self.logger.debug("MODEL_POLICY: NOT creating RCORDSubscriber chain for %s" % si.id, status=si.status)
+            else:
+                self.logger.debug("MODEL_POLICY: creating RCORDSubscriber chain for %s" % si.id, status=si.status)
+                # if it does not have a chain,
+                # Find links to the next element in the service chain
+                # and create one
+                links = si.owner.subscribed_dependencies.all()
 
-            for link in links:
-                si_class = link.provider_service.get_service_instance_class_name()
-                self.logger.info("MODEL_POLICY: RCORDSubscriber %s creating %s" % (si, si_class))
+                for link in links:
+                    si_class = link.provider_service.get_service_instance_class_name()
+                    self.logger.info("MODEL_POLICY: RCORDSubscriber %s creating %s" % (si, si_class))
 
-                eastbound_si_class = model_accessor.get_model_class(si_class)
-                eastbound_si = eastbound_si_class()
-                eastbound_si.owner_id = link.provider_service_id
-                eastbound_si.save()
-                link = ServiceInstanceLink(provider_service_instance=eastbound_si, subscriber_service_instance=si)
-                link.save()
+                    eastbound_si_class = model_accessor.get_model_class(si_class)
+                    eastbound_si = eastbound_si_class()
+                    eastbound_si.owner_id = link.provider_service_id
+                    eastbound_si.save()
+                    link = ServiceInstanceLink(provider_service_instance=eastbound_si, subscriber_service_instance=si)
+                    link.save()
 
     def handle_delete(self, si):
         pass
