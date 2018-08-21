@@ -26,4 +26,5 @@ message RCORDSubscriber (ServiceInstance) {
     // operator specific fields
     optional string nas_port_id = 20 [db_index = False];
     optional string circuit_id = 21 [db_index = False];
+    optional string remote_id = 22 [db_index = False];
 }
