@@ -4,7 +4,7 @@ option legacy="True";
 
 message RCORDService (Service) {
     option verbose_name = "RCORD Service";
-    required string access = 11 [help_text = "Who is managing the Access Network", default = "voltha", choices = "(('voltha', 'VOLTHA'),)", max_length = 30, blank = False, null = False, db_index = False];
+    required string access = 11 [help_text = "Who is managing the Access Network", default = "voltha", choices = "(('voltha', 'VOLTHA'),)", max_length = 30, db_index = False];
 }
 
 message RCORDSubscriber (ServiceInstance) {
@@ -13,15 +13,15 @@ message RCORDSubscriber (ServiceInstance) {
     option owner_class_name = "RCORDService";
 
     // vsg related configurations
-    optional manytoone creator->User:created_rcord_subscribers = 15 [db_index = True, null = True, blank = True];
-    optional string status = 11 [default = "enabled", choices = "(('enabled', 'Enabled'), ('disabled', 'Disabled'), ('pre-provisioned', 'Pre Provisioned'), ('awaiting-auth', 'Awaiting Authentication'), ('auth-failed', 'Authentication Failed'))", max_length = 30, content_type = "stripped", blank = False, null = False, db_index = False];
+    optional manytoone creator->User:created_rcord_subscribers = 15 [db_index = True];
+    optional string status = 11 [default = "enabled", choices = "(('enabled', 'Enabled'), ('disabled', 'Disabled'), ('pre-provisioned', 'Pre Provisioned'), ('awaiting-auth', 'Awaiting Authentication'), ('auth-failed', 'Authentication Failed'))", max_length = 30, content_type = "stripped", db_index = False];
 
     // parameters for r-cord lite
-    optional int32 c_tag = 12 [null = True, db_index = False, blank = False, min_value = 0, max_value = 4096];
-    optional int32 s_tag = 19 [null = True, db_index = False, blank = False, min_value = 0, max_value = 4096];
-    required string onu_device = 13 [help_text = "ONUDevice serial number", null = False, db_index = False, blank = False];
-    optional string ip_address = 17 [help_text = "Subscriber IP Address", null = True, db_index = False, blank = False];
-    optional string mac_address = 18 [null = True, db_index = False, blank = False];
+    optional int32 c_tag = 12 [db_index = False, min_value = 0, max_value = 4096];
+    optional int32 s_tag = 19 [db_index = False, min_value = 0, max_value = 4096];
+    required string onu_device = 13 [help_text = "ONUDevice serial number", db_index = False];
+    optional string ip_address = 17 [help_text = "Subscriber IP Address", db_index = False];
+    optional string mac_address = 18 [db_index = False];
 
     // operator specific fields
     optional string nas_port_id = 20 [db_index = False];
