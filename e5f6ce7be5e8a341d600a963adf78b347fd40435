@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "31ff1ef5_8711162e",
+        "filename": "xos/synchronizer/models/rcord.xproto",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000162
+      },
+      "writtenOn": "2018-08-29T15:19:44Z",
+      "side": 1,
+      "message": "typo - \"unknwon\"",
+      "revId": "e5f6ce7be5e8a341d600a963adf78b347fd40435",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
