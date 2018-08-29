@@ -4,7 +4,7 @@ option legacy="True";
 
 message RCORDService (Service) {
     option verbose_name = "RCORD Service";
-    required string access = 11 [help_text = "Who is managing the Access Network", default = "voltha", choices = "(('voltha', 'VOLTHA'),)", max_length = 30, db_index = False];
+    required string access = 11 [help_text = "Who is managing the Access Network", default = "voltha", choices = "(('voltha', 'VOLTHA'), ('unknown', 'Unknown'))", max_length = 30, db_index = False];
 }
 
 message RCORDSubscriber (ServiceInstance) {
