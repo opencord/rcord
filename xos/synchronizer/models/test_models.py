@@ -46,6 +46,11 @@ class TestRCORDModels(unittest.TestCase):
         self.models_decl.RCORDSubscriber_decl.objects = Mock()
         self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = []
 
+        self.models_decl.RCORDIpAddress_decl = MagicMock
+        self.models_decl.RCORDIpAddress_decl.save = Mock()
+        self.models_decl.RCORDIpAddress_decl.objects = Mock()
+        self.models_decl.RCORDIpAddress_decl.objects.filter.return_value = []
+
 
         modules = {
             'xos.exceptions': self.xos.exceptions,
@@ -57,7 +62,7 @@ class TestRCORDModels(unittest.TestCase):
 
         self.volt = Mock()
 
-        from models import RCORDSubscriber
+        from models import RCORDSubscriber, RCORDIpAddress
 
         self.rcord_subscriber_class = RCORDSubscriber
 
@@ -67,10 +72,14 @@ class TestRCORDModels(unittest.TestCase):
         self.rcord_subscriber.onu_device = "BRCM1234"
         self.rcord_subscriber.c_tag = 111
         self.rcord_subscriber.s_tag = 222
-        self.rcord_subscriber.ip_address = "1.1.1.1"
+        self.rcord_subscriber.ips = Mock()
+        self.rcord_subscriber.ips.all.return_value = []
         self.rcord_subscriber.mac_address = "00:AA:00:00:00:01"
         self.rcord_subscriber.owner.leaf_model.access = "voltha"
         self.rcord_subscriber.owner.provider_services = [self.volt]
+
+        self.rcord_ip = RCORDIpAddress()
+        self.rcord_ip.subscriber = 1;
 
     def tearDown(self):
         sys.path = self.sys_path_save
@@ -79,20 +88,28 @@ class TestRCORDModels(unittest.TestCase):
         self.rcord_subscriber.save()
         self.models_decl.RCORDSubscriber_decl.save.assert_called()
 
-    def test_validate_ip_address(self):
-        self.rcord_subscriber.ip_address = "invalid"
+    def _test_validate_ipv4_address(self):
+        self.rcord_ip.ip = "192.168.0."
         with self.assertRaises(Exception) as e:
-            self.rcord_subscriber.save()
+            self.rcord_ip.save()
 
-        self.assertEqual(e.exception.message, "The ip_address you specified (invalid) is not valid")
-        self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
+        self.assertEqual(e.exception.message, "The IP specified is not valid: 192.168.0.")
+        self.models_decl.RCORDIpAddress.save.assert_not_called()
+
+    def test_validate_ipv6_address(self):
+        self.rcord_ip.ip = "2001:0db8:85a3:0000:0000:8a2e:03"
+        with self.assertRaises(Exception) as e:
+            self.rcord_ip.save()
+
+        self.assertEqual(e.exception.message, "The IP specified is not valid: 2001:0db8:85a3:0000:0000:8a2e:03")
+        self.models_decl.RCORDIpAddress.save.assert_not_called()
 
     def test_validate_mac_address(self):
         self.rcord_subscriber.mac_address = "invalid"
         with self.assertRaises(Exception) as e:
             self.rcord_subscriber.save()
 
-        self.assertEqual(e.exception.message, "The mac_address you specified (invalid) is not valid")
+        self.assertEqual(e.exception.message, "The MAC address specified is not valid: invalid")
         self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
 
     def test_valid_onu_device(self):
