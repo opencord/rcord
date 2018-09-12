@@ -20,11 +20,18 @@ message RCORDSubscriber (ServiceInstance) {
     optional int32 c_tag = 12 [db_index = False, min_value = 0, max_value = 4096];
     optional int32 s_tag = 19 [db_index = False, min_value = 0, max_value = 4096];
     required string onu_device = 13 [help_text = "ONUDevice serial number", db_index = False];
-    optional string ip_address = 17 [help_text = "Subscriber IP Address", db_index = False];
     optional string mac_address = 18 [db_index = False];
 
     // operator specific fields
     optional string nas_port_id = 20 [db_index = False];
     optional string circuit_id = 21 [db_index = False];
     optional string remote_id = 22 [db_index = False];
+}
+
+message RCORDIpAddress(XOSBase) {
+    option verbose_name = "IP address";
+
+    required manytoone subscriber->RCORDSubscriber:ips = 1:1001 [help_text = "The subscriber the IP address belongs to", db_index = True, null = False, blank = False];
+    required string ip = 2 [help_text = "The unique IP address (either IPv4 or IPv6 / netmask)", max_length = 52, null = False, db_index = False, blank = False, unique_with = "subscriber"];
+    optional string description = 3 [help_text = "A short description of the IP address", max_length = 254, null = False, db_index = False, blank = False];
 }

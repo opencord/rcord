@@ -67,7 +67,7 @@ class TestRCORDModels(unittest.TestCase):
         self.rcord_subscriber.onu_device = "BRCM1234"
         self.rcord_subscriber.c_tag = 111
         self.rcord_subscriber.s_tag = 222
-        self.rcord_subscriber.ip_address = "1.1.1.1"
+        self.rcord_subscriber.ips = ["192.168.0.1", "2001:0db8:85a3:0000:0000:8a2e:0370:7334"]
         self.rcord_subscriber.mac_address = "00:AA:00:00:00:01"
         self.rcord_subscriber.owner.leaf_model.access = "voltha"
         self.rcord_subscriber.owner.provider_services = [self.volt]
@@ -79,12 +79,20 @@ class TestRCORDModels(unittest.TestCase):
         self.rcord_subscriber.save()
         self.models_decl.RCORDSubscriber_decl.save.assert_called()
 
-    def test_validate_ip_address(self):
-        self.rcord_subscriber.ip_address = "invalid"
+    def test_validate_ipv4_address(self):
+        self.rcord_subscriber.ips = ["192.168", "2001:0db8:85a3:0000:0000:8a2e:0370:7334"]
         with self.assertRaises(Exception) as e:
             self.rcord_subscriber.save()
 
-        self.assertEqual(e.exception.message, "The ip_address you specified (invalid) is not valid")
+        self.assertEqual(e.exception.message, "One of the IPs specified is not valid: 192.168")
+        self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
+
+    def test_validate_ipv4_address(self):
+        self.rcord_subscriber.ips = ["192.168.0.1", "2001:0db8:85a3:0000:0000:8a2e:03"]
+        with self.assertRaises(Exception) as e:
+            self.rcord_subscriber.save()
+
+        self.assertEqual(e.exception.message, "One of the IPs specified is not valid: 2001:0db8:85a3:0000:0000:8a2e:03")
         self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
 
     def test_validate_mac_address(self):
@@ -92,7 +100,7 @@ class TestRCORDModels(unittest.TestCase):
         with self.assertRaises(Exception) as e:
             self.rcord_subscriber.save()
 
-        self.assertEqual(e.exception.message, "The mac_address you specified (invalid) is not valid")
+        self.assertEqual(e.exception.message, "The MAC address specified is not valid: invalid")
         self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
 
     def test_valid_onu_device(self):
