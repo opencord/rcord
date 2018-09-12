@@ -17,11 +17,28 @@ import socket
 import random
 
 from xos.exceptions import XOSValidationError, XOSProgrammingError, XOSPermissionDenied
-from models_decl import RCORDService_decl, RCORDSubscriber_decl
+from models_decl import RCORDService_decl, RCORDSubscriber_decl, RCORDIpAddress_decl
 
 class RCORDService(RCORDService_decl):
     class Meta:
         proxy = True
+
+class RCORDIpAddress(RCORDIpAddress_decl):
+    class Meta:
+        proxy = True
+
+    def save(self, *args, **kwargs):
+        try:
+            if ":" in self.ip:
+                # it's an IPv6 address
+                socket.inet_pton(socket.AF_INET6, self.ip)
+            else:
+                # it's an IPv4 address
+                socket.inet_pton(socket.AF_INET, self.ip)
+        except socket.error:
+            raise XOSValidationError("The IP specified is not valid: %s" % self.ip)
+        super(RCORDIpAddress, self).save(*args, **kwargs)
+        return
 
 class RCORDSubscriber(RCORDSubscriber_decl):
 
@@ -61,7 +78,6 @@ class RCORDSubscriber(RCORDSubscriber_decl):
         return used_tags
 
     def save(self, *args, **kwargs):
-
         self.validate_unique_service_specific_id(none_okay=True)
 
         # VSGServiceInstance will extract the creator from the Subscriber, as it needs a creator to create its
@@ -72,17 +88,10 @@ class RCORDSubscriber(RCORDSubscriber_decl):
                 raise XOSProgrammingError("RCORDSubscriber's self.caller was not set")
             self.creator = self.caller
 
-        # validate IP Address
-        if hasattr(self, 'ip_address') and self.ip_address is not None:
-            try:
-                socket.inet_aton(self.ip_address)
-            except socket.error:
-                raise XOSValidationError("The ip_address you specified (%s) is not valid" % self.ip_address)
-
         # validate MAC Address
         if hasattr(self, 'mac_address') and self.mac_address is not None:
             if not re.match("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", self.mac_address.lower()):
-                raise XOSValidationError("The mac_address you specified (%s) is not valid" % self.mac_address)
+                raise XOSValidationError("The MAC address specified is not valid: %s" % self.mac_address)
 
         # validate c_tag
         if hasattr(self, 'c_tag') and self.c_tag is not None:
