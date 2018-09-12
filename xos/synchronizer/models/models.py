@@ -72,17 +72,23 @@ class RCORDSubscriber(RCORDSubscriber_decl):
                 raise XOSProgrammingError("RCORDSubscriber's self.caller was not set")
             self.creator = self.caller
 
-        # validate IP Address
-        if hasattr(self, 'ip_address') and self.ip_address is not None:
-            try:
-                socket.inet_aton(self.ip_address)
-            except socket.error:
-                raise XOSValidationError("The ip_address you specified (%s) is not valid" % self.ip_address)
+        # validate IP addresses
+        if hasattr(self, 'ips') and self.ips is not None:
+            for ip in self.ips:
+                try:
+                    if ":" in ip:
+                        # it's an IPv6 address
+                        socket.inet_pton(socket.AF_INET6, ip)
+                    else:
+                        # it's an IPv4 address
+                        socket.inet_pton(socket.AF_INET, ip)
+                except socket.error:
+                    raise XOSValidationError("One of the IPs specified is not valid: %s" % ip)
 
         # validate MAC Address
         if hasattr(self, 'mac_address') and self.mac_address is not None:
             if not re.match("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", self.mac_address.lower()):
-                raise XOSValidationError("The mac_address you specified (%s) is not valid" % self.mac_address)
+                raise XOSValidationError("The MAC address specified is not valid: %s" % self.mac_address)
 
         # validate c_tag
         if hasattr(self, 'c_tag') and self.c_tag is not None:
