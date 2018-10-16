@@ -36,7 +36,7 @@ class RCORDSubscriber(RCORDSubscriber_decl):
 
         for link in self.subscribed_links.all():
             outer_service_instance = link.provider_service_instance
-            # TODO: We may need to invalide the vOLT too...
+            # TODO: We may need to invalidate the vOLT too...
             for link in outer_service_instance.subscribed_links.all():
                 inner_service_instance = link.provider_service_instance
                 inner_service_instance.save(update_fields=["updated"])
@@ -54,8 +54,11 @@ class RCORDSubscriber(RCORDSubscriber_decl):
         return tag
 
     def get_used_c_tags(self):
+        # TODO add validation for no duplicate c_tag on the same s_tag
         same_onu_subscribers = RCORDSubscriber.objects.filter(onu_device=self.onu_device)
-        return [s.c_tag for s in same_onu_subscribers]
+        same_onu_subscribers = [s for s in same_onu_subscribers if s.id != self.id]
+        used_tags = [s.c_tag for s in same_onu_subscribers]
+        return used_tags
 
     def save(self, *args, **kwargs):
 

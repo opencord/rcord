@@ -107,7 +107,19 @@ class TestRCORDModels(unittest.TestCase):
         self.assertEqual(e.exception.message, "The onu_device you specified (BRCM1234) does not exists")
         self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
 
-    def test_validate_c_tag(self):
+    def test_validate_c_tag_pass(self):
+        """
+        check that other subscriber attached to the same ONU don't have the same c_tag
+        """
+
+        self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = [self.rcord_subscriber]
+
+
+        self.rcord_subscriber.save()
+
+        self.models_decl.RCORDSubscriber_decl.save.assert_called()
+
+    def test_validate_c_tag_fail(self):
         """
         check that other subscriber attached to the same ONU don't have the same c_tag
         """
@@ -116,13 +128,30 @@ class TestRCORDModels(unittest.TestCase):
         s.c_tag = 111
         s.onu_device = "BRCM1234"
 
-        self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = [s]
+        self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = [s, self.rcord_subscriber]
 
         with self.assertRaises(Exception) as e:
             self.rcord_subscriber.save()
 
         self.assertEqual(e.exception.message, "The c_tag you specified (111) has already been used on device BRCM1234")
         self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
+
+    def _test_validate_c_tag_on_same_s_tag(self):
+        """
+        check that other subscriber using the same s_tag don't have the same c_tag
+        """
+        s = Mock()
+        s.id = 123
+        s.c_tag = 111
+        s.s_tag = 222
+        s.onu_device = "BRCM1234"
+
+        with self.assertRaises(Exception) as e:
+            self.rcord_subscriber.save()
+
+        self.assertEqual(e.exception.message, "The c_tag you specified (111) has already been used by Subscriber with id 123 and the same s_tag: 222")
+        self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
+
 
     def test_validate_c_tag_on_update(self):
         s = Mock()
