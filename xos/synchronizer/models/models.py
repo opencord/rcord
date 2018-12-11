@@ -89,12 +89,12 @@ class RCORDSubscriber(RCORDSubscriber_decl):
             self.creator = self.caller
 
         # validate MAC Address
-        if hasattr(self, 'mac_address') and self.mac_address is not None:
+        if hasattr(self, 'mac_address') and self.mac_address:
             if not re.match("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", self.mac_address.lower()):
                 raise XOSValidationError("The MAC address specified is not valid: %s" % self.mac_address)
 
         # validate c_tag
-        if hasattr(self, 'c_tag') and self.c_tag is not None:
+        if hasattr(self, 'c_tag') and self.c_tag:
             is_update_with_same_tag = False
 
             if not self.is_new:
@@ -107,10 +107,10 @@ class RCORDSubscriber(RCORDSubscriber_decl):
             if self.c_tag in self.get_used_c_tags() and not is_update_with_same_tag:
                 raise XOSValidationError("The c_tag you specified (%s) has already been used on device %s" % (self.c_tag, self.onu_device))
 
-        if not hasattr(self, "c_tag") or self.c_tag is None:
+        if not hasattr(self, "c_tag") or not self.c_tag:
             self.c_tag = self.generate_c_tag()
 
-        if not hasattr(self, "s_tag") or self.s_tag is None:
+        if not hasattr(self, "s_tag") or not self.s_tag:
             self.s_tag = self.generate_s_tag()
 
         self.set_owner()
