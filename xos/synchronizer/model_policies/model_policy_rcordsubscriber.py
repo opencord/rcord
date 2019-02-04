@@ -13,8 +13,8 @@
 # limitations under the License.
 
 
-from synchronizers.new_base.modelaccessor import ServiceInstanceLink, model_accessor
-from synchronizers.new_base.policy import Policy
+from xossynchronizer.modelaccessor import ServiceInstanceLink, model_accessor
+from xossynchronizer.model_policies.policy import Policy
 
 class RCORDSubscriberPolicy(Policy):
     model_name = "RCORDSubscriber"

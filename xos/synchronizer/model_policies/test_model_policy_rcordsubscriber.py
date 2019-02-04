@@ -20,44 +20,31 @@ from mock import patch, Mock
 import os, sys
 
 test_path=os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-service_dir=os.path.join(test_path, "../../../..")
-xos_dir=os.path.join(test_path, "../../..")
-if not os.path.exists(os.path.join(test_path, "new_base")):
-    xos_dir=os.path.join(test_path, "../../../../../../orchestration/xos/xos")
-    services_dir=os.path.join(xos_dir, "../../xos_services")
-
-# While transitioning from static to dynamic load, the path to find neighboring xproto files has changed. So check
-# both possible locations...
-def get_models_fn(service_name, xproto_name):
-    name = os.path.join(service_name, "xos", xproto_name)
-    if os.path.exists(os.path.join(services_dir, name)):
-        return name
-    else:
-        name = os.path.join(service_name, "xos", "synchronizer", "models", xproto_name)
-        if os.path.exists(os.path.join(services_dir, name)):
-            return name
-    raise Exception("Unable to find service=%s xproto=%s" % (service_name, xproto_name))
 
 class TestModelPolicyRCORDSubscriber(unittest.TestCase):
     def setUp(self):
 
         self.sys_path_save = sys.path
-        sys.path.append(xos_dir)
-        sys.path.append(os.path.join(xos_dir, 'synchronizers', 'new_base'))
 
         config = os.path.join(test_path, "../test_config.yaml")
         from xosconfig import Config
         Config.clear()
         Config.init(config, 'synchronizer-config-schema.yaml')
 
-        from synchronizers.new_base.mock_modelaccessor_build import build_mock_modelaccessor
-        build_mock_modelaccessor(xos_dir, services_dir, [
-            get_models_fn("../profiles/rcord", "rcord.xproto"),
-            get_models_fn("olt-service", "volt.xproto") # in test create we spy on VOLTServiceInstance
-        ])
+        from xossynchronizer.mock_modelaccessor_build import mock_modelaccessor_config
+        mock_modelaccessor_config(test_path, [
+            ("../profiles/rcord", "rcord.xproto"),
+            ("olt-service", "volt.xproto")])
 
-        import synchronizers.new_base.modelaccessor
-        from model_policy_rcordsubscriber import RCORDSubscriberPolicy, model_accessor
+        import xossynchronizer.modelaccessor
+        import mock_modelaccessor
+        reload(mock_modelaccessor) # in case nose2 loaded it in a previous test
+        reload(xossynchronizer.modelaccessor)      # in case nose2 loaded it in a previous test
+
+        from xossynchronizer.modelaccessor import model_accessor
+        self.model_accessor = model_accessor
+
+        from model_policy_rcordsubscriber import RCORDSubscriberPolicy
 
         from mock_modelaccessor import MockObjectList
 
@@ -69,7 +56,7 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
         # tags. Ideally, this wouldn't happen, but it does. So make sure we reset the world.
         model_accessor.reset_all_object_stores()
 
-        self.policy = RCORDSubscriberPolicy()
+        self.policy = RCORDSubscriberPolicy(model_accessor=self.model_accessor)
         self.si = Mock(name="myTestSubscriber")
 
     def tearDown(self):
