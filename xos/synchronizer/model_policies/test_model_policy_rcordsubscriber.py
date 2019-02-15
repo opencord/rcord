@@ -33,7 +33,7 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
 
         from xossynchronizer.mock_modelaccessor_build import mock_modelaccessor_config
         mock_modelaccessor_config(test_path, [
-            ("../profiles/rcord", "rcord.xproto"),
+            ("rcord", "rcord.xproto"),
             ("olt-service", "volt.xproto")])
 
         import xossynchronizer.modelaccessor
