@@ -16,7 +16,7 @@
 # docker build -t xosproject/rcord-synchronizer:candidate -f Dockerfile.synchronizer .
 
 # xosproject/rcord-synchronizer
-FROM xosproject/xos-synchronizer-base:2.1.38
+FROM xosproject/xos-synchronizer-base:2.1.50
 
 COPY xos/synchronizer /opt/xos/synchronizers/rcord
 COPY VERSION /opt/xos/synchronizers/rcord/
