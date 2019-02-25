@@ -15,6 +15,7 @@
 
 
 name: rcord
+core_version: ">=2.2.1"
 required_models:
   - RCORDService
   - RCORDSubscriber
