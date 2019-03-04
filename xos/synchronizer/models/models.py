@@ -115,7 +115,7 @@ class RCORDSubscriber(RCORDSubscriber_decl):
 
         self.set_owner()
 
-        if self.status != "pre-provisioned" and hasattr(self.owner.leaf_model, "access") and self.owner.leaf_model.access == "voltha":
+        if self.status != "pre-provisioned" and hasattr(self.owner.leaf_model, "access") and self.owner.leaf_model.access == "voltha" and not self.deleted:
 
             # if the access network is managed by voltha, validate that onu_device actually exist
             volt_service = self.owner.provider_services[0].leaf_model # we assume RCORDService is connected only to the vOLTService
