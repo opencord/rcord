@@ -67,6 +67,7 @@ class TestRCORDModels(unittest.TestCase):
         self.rcord_subscriber_class = RCORDSubscriber
 
         self.rcord_subscriber = RCORDSubscriber()
+        self.rcord_subscriber.deleted = False
         self.rcord_subscriber.id = None # this is a new model
         self.rcord_subscriber.is_new = True
         self.rcord_subscriber.onu_device = "BRCM1234"
@@ -124,13 +125,18 @@ class TestRCORDModels(unittest.TestCase):
         self.assertEqual(e.exception.message, "The onu_device you specified (BRCM1234) does not exists")
         self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
 
+    def test_missing_onu_device_on_delete(self):
+        self.volt.leaf_model.has_access_device.return_value = False
+        self.rcord_subscriber.deleted = True
+        self.rcord_subscriber.save()
+        self.models_decl.RCORDSubscriber_decl.save.assert_called()
+
     def test_validate_c_tag_pass(self):
         """
         check that other subscriber attached to the same ONU don't have the same c_tag
         """
 
         self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = [self.rcord_subscriber]
-
 
         self.rcord_subscriber.save()
 
