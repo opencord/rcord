@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# docker build -t xosproject/rcord-synchronizer:candidate -f Dockerfile.synchronizer .
+# docker build -t 10.128.22.1:30500/xosproject/rcord-synchronizer:candidate -f Dockerfile.synchronizer .
 
 # xosproject/rcord-synchronizer
-FROM xosproject/xos-synchronizer-base:2.1.50
+FROM xosproject/xos-synchronizer-base:2.1.55
 
 COPY xos/synchronizer /opt/xos/synchronizers/rcord
 COPY VERSION /opt/xos/synchronizers/rcord/
