@@ -67,20 +67,14 @@ message RCORDIpAddress(XOSBase) {
 
     required manytoone subscriber->RCORDSubscriber:ips = 1:1001 [
         help_text = "The subscriber the IP address belongs to",
-        blank = False,
-        db_index = True,
-        null = False];
+        db_index = True];
     required string ip = 2 [
         help_text = "The unique IP address (either IPv4 or IPv6 / netmask)",
-        blank = False,
         db_index = False,
         max_length = 52,
-        null = False,
         unique_with = "subscriber"];
     optional string description = 3 [
         help_text = "A short description of the IP address",
-        blank = False,
         db_index = False,
-        max_length = 254,
-        null = False];
+        max_length = 254];
 }
