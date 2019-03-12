@@ -17,7 +17,7 @@
 
 # xosproject/rcord-synchronizer
 
-FROM xosproject/xos-synchronizer-base:2.2.11
+FROM xosproject/xos-synchronizer-base:2.2.18
 
 COPY xos/synchronizer /opt/xos/synchronizers/rcord
 COPY VERSION /opt/xos/synchronizers/rcord/
