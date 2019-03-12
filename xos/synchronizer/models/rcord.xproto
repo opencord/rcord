@@ -9,7 +9,6 @@ message RCORDService (Service) {
     required string access = 11 [
         help_text = "Name of service that is managing the Access Network",
         default = "voltha", choices = "(('voltha', 'VOLTHA'), ('unknown', 'Unknown'))",
-        db_index = False,
         max_length = 30];
 }
 
@@ -26,7 +25,6 @@ message RCORDSubscriber (ServiceInstance) {
     optional string status = 11 [
         help_text = "Status of subscriber provisioning and authentication",
         content_type = "stripped",
-        db_index = False,
         default = "enabled",
         choices = "(('enabled', 'Enabled'), ('disabled', 'Disabled'), ('pre-provisioned', 'Pre Provisioned'), ('awaiting-auth', 'Awaiting Authentication'), ('auth-failed', 'Authentication Failed'))",
         max_length = 30];
@@ -34,31 +32,24 @@ message RCORDSubscriber (ServiceInstance) {
     // parameters for r-cord lite
     optional int32 c_tag = 12 [
         help_text = "Customer VLAN Tag, one half of the double-tag that identifies this subscriber's traffic",
-        db_index = False,
         min_value = 0,
         max_value = 4096];
     optional int32 s_tag = 19 [
         help_text = "Service VLAN Tag, one half of the double-tag that identifies this subscriber's traffic",
-        db_index = False,
         min_value = 0,
         max_value = 4096];
     required string onu_device = 13 [
-        help_text = "ONUDevice serial number",
-        db_index = False];
+        help_text = "ONUDevice serial number"];
     optional string mac_address = 18 [
-        help_text = "Subscriber MAC Address",
-        db_index = False];
+        help_text = "Subscriber MAC Address"];
 
     // operator specific fields
     optional string nas_port_id = 20 [
-        help_text = "NAS Port ID used in Radius to identify physical interface used to authenticate subscriber",
-        db_index = False];
+        help_text = "NAS Port ID used in Radius to identify physical interface used to authenticate subscriber"];
     optional string circuit_id = 21 [
-        help_text = "Option 82 Circuit ID for DHCP relay agent",
-        db_index = False];
+        help_text = "Option 82 Circuit ID for DHCP relay agent"];
     optional string remote_id = 22 [
-        help_text = "Option 82 Remote ID for DHCP relay agent",
-        db_index = False];
+        help_text = "Option 82 Remote ID for DHCP relay agent"];
 }
 
 message RCORDIpAddress(XOSBase) {
@@ -70,11 +61,9 @@ message RCORDIpAddress(XOSBase) {
         db_index = True];
     required string ip = 2 [
         help_text = "The unique IP address (either IPv4 or IPv6 / netmask)",
-        db_index = False,
         max_length = 52,
         unique_with = "subscriber"];
     optional string description = 3 [
         help_text = "A short description of the IP address",
-        db_index = False,
         max_length = 254];
 }
