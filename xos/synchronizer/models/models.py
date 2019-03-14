@@ -17,7 +17,11 @@ import socket
 import random
 
 from xos.exceptions import XOSValidationError, XOSProgrammingError, XOSPermissionDenied
-from models_decl import RCORDService_decl, RCORDSubscriber_decl, RCORDIpAddress_decl
+from models_decl import RCORDService_decl, RCORDSubscriber_decl, RCORDIpAddress_decl, BandwidthProfile_decl
+
+class BandwidthProfile(BandwidthProfile_decl):
+    class Meta:
+        proxy = True
 
 class RCORDService(RCORDService_decl):
     class Meta:

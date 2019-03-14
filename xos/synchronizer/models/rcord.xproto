@@ -12,6 +12,19 @@ message RCORDService (Service) {
         max_length = 30];
 }
 
+message BandwidthProfile(XOSBase) {
+    option verbose_name = "Bandwidth Profile";
+    option description = "The Bandwidth Profile assinged to a residential subscriber";
+
+    // TODO add help_text
+    required string name = 3;
+    required int32 cir = 4;
+    required int32 cbs = 5;
+    required int32 eir = 6;
+    required int32 ebs = 7;
+    required int32 air = 8;
+}
+
 message RCORDSubscriber (ServiceInstance) {
     option kind = "RCORDSubscriber";
     option verbose_name = "RCORD Subscriber";
@@ -50,6 +63,11 @@ message RCORDSubscriber (ServiceInstance) {
         help_text = "Option 82 Circuit ID for DHCP relay agent"];
     optional string remote_id = 22 [
         help_text = "Option 82 Remote ID for DHCP relay agent"];
+
+    required manytoone upstream_bps->BandwidthProfile:us_subscriber = 31:1001 [
+        help_text = "The subscriber the IP address belongs to"];
+    required manytoone downstream_bps->BandwidthProfile:ds_subscriber = 32:1002 [
+        help_text = "The subscriber the IP address belongs to"];
 }
 
 message RCORDIpAddress(XOSBase) {
