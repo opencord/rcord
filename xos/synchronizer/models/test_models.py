@@ -159,22 +159,33 @@ class TestRCORDModels(unittest.TestCase):
         self.assertEqual(e.exception.message, "The c_tag you specified (111) has already been used on device BRCM1234")
         self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
 
-    def _test_validate_c_tag_on_same_s_tag(self):
+    def test_validate_get_used_s_c_tag_subscriber_id(self):
         """
         check that other subscriber using the same s_tag don't have the same c_tag
         """
-        s = Mock()
-        s.id = 123
-        s.c_tag = 111
-        s.s_tag = 222
-        s.onu_device = "BRCM1234"
+        s1 = Mock()
+        s1.id = 456
+        s1.c_tag = 999
+        s1.s_tag = 222
+        s1.onu_device = "BRCM1234"
+
+        s2 = Mock()
+        s2.id = 123
+        s2.c_tag = 111
+        s2.s_tag = 222
+        s2.onu_device = "BRCM12345"
+
+        self.rcord_subscriber.get_same_onu_subscribers = Mock()
+        self.rcord_subscriber.get_same_onu_subscribers.return_value = [s1]
+
+        self.rcord_subscriber.get_same_s_c_tag_subscribers = Mock()
+        self.rcord_subscriber.get_same_s_c_tag_subscribers.return_value = [s2]
 
         with self.assertRaises(Exception) as e:
             self.rcord_subscriber.save()
 
-        self.assertEqual(e.exception.message, "The c_tag you specified (111) has already been used by Subscriber with id 123 and the same s_tag: 222")
+        self.assertEqual(e.exception.message, "The c_tag(111) and s_tag(222) pair you specified,has already been used by Subscriber with Id (123)")
         self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
-
 
     def test_validate_c_tag_on_update(self):
         s = Mock()
@@ -210,9 +221,15 @@ class TestRCORDModels(unittest.TestCase):
     def test_generate_c_tag(self):
         s = Mock()
         s.c_tag = "111"
+        s.s_tag = "223"
         s.onu_device = "BRCM1234"
 
-        self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = [s]
+        self.rcord_subscriber.get_same_onu_subscribers = Mock()
+        self.rcord_subscriber.get_same_onu_subscribers.return_value = [s]
+
+        self.rcord_subscriber.get_same_s_c_tag_subscribers = Mock()
+        self.rcord_subscriber.get_same_s_c_tag_subscribers.return_value = []
+
         self.rcord_subscriber.c_tag = None
 
         self.rcord_subscriber.save()
@@ -223,7 +240,7 @@ class TestRCORDModels(unittest.TestCase):
         self.assertLess(self.rcord_subscriber.c_tag, 4097)
 
     def test_generate_s_tag(self):
-        self.rcord_subscriber.c_tag = None
+        self.rcord_subscriber.s_tag = None
 
         self.rcord_subscriber.save()
 
@@ -234,7 +251,6 @@ class TestRCORDModels(unittest.TestCase):
         self.rcord_subscriber.save()
         self.models_decl.RCORDSubscriber_decl.save.assert_called()
         self.assertEqual(self.rcord_subscriber.s_tag, 222)
-
 
 
 if __name__ == '__main__':
