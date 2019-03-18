@@ -65,21 +65,61 @@ class RCORDSubscriber(RCORDSubscriber_decl):
     def generate_s_tag(self):
         # NOTE what's the right way to generate an s_tag?
         tag = random.randint(16, 4096)
-        return tag
+ 
+        # Check that combination(c_tag,s_tag) is unique.
+        # If the combination is not unique it will keep on calling this function recursively till it gets a unique combination.
+
+        self.s_tag = tag
+        if None != self.get_used_s_c_tag_subscriber_id():
+            return self.generate_s_tag()
+        else:
+            return tag
+
 
     def generate_c_tag(self):
         # NOTE this method will loop if available c_tags are ended
         tag = random.randint(16, 4096)
+
+        # Check that this random generated value is valid across given ONU-first check.
+        # If the value is valid it will assign c_tag wth it and do second check.
+        # If the value is not valid below function is recursively called till it gets a unique value.
+
         if tag in self.get_used_c_tags():
             return self.generate_c_tag()
-        return tag
+        else:
+            self.c_tag = tag
+
+        # Scenario if we don't have a s_tag.
+        # Second check-verify that combination is unique across.
+
+        if not self.s_tag:
+            self.s_tag = self.generate_s_tag()
+            return tag
+        elif None != self.get_used_s_c_tag_subscriber_id():
+            return self.generate_c_tag()
+        else:
+            return tag
+
+    def get_same_onu_subscribers(self):
+        return RCORDSubscriber.objects.filter(onu_device=self.onu_device)
+
+    def get_same_s_c_tag_subscribers(self):
+        return RCORDSubscriber.objects.filter(c_tag=self.c_tag, s_tag=self.s_tag)
 
     def get_used_c_tags(self):
-        # TODO add validation for no duplicate c_tag on the same s_tag
-        same_onu_subscribers = RCORDSubscriber.objects.filter(onu_device=self.onu_device)
+        same_onu_subscribers = self.get_same_onu_subscribers() 
         same_onu_subscribers = [s for s in same_onu_subscribers if s.id != self.id]
         used_tags = [s.c_tag for s in same_onu_subscribers]
         return used_tags
+
+    def get_used_s_c_tag_subscriber_id(self):
+        # Function to check c_tag and s_tag combination are unique across.
+        same_s_c_tag_subscribers = self.get_same_s_c_tag_subscribers()
+        same_s_c_tag_subscribers = [s for s in same_s_c_tag_subscribers if s.id != self.id]
+        if len(same_s_c_tag_subscribers) > 0:
+            return same_s_c_tag_subscribers[0].id
+        else:
+            return None 
 
     def save(self, *args, **kwargs):
         self.validate_unique_service_specific_id(none_okay=True)
@@ -98,12 +138,12 @@ class RCORDSubscriber(RCORDSubscriber_decl):
                 raise XOSValidationError("The MAC address specified is not valid: %s" % self.mac_address)
 
         # validate c_tag
-        if hasattr(self, 'c_tag') and self.c_tag:
+        if self.c_tag:
             is_update_with_same_tag = False
 
             if not self.is_new:
                 # if it is an update, but the tag is the same, skip validation
-                existing = RCORDSubscriber.objects.filter(c_tag=self.c_tag)
+                existing = RCORDSubscriber.objects.filter(id=self.id)
 
                 if len(existing) > 0 and existing[0].c_tag == self.c_tag and existing[0].id == self.id:
                     is_update_with_same_tag = True
@@ -111,10 +151,24 @@ class RCORDSubscriber(RCORDSubscriber_decl):
             if self.c_tag in self.get_used_c_tags() and not is_update_with_same_tag:
                 raise XOSValidationError("The c_tag you specified (%s) has already been used on device %s" % (self.c_tag, self.onu_device))
 
-        if not hasattr(self, "c_tag") or not self.c_tag:
+        # validate s_tag and c_tag combination
+        if self.c_tag and self.s_tag:
+            is_update_with_same_tag = False
+
+            if not self.is_new:
+                # if it is an update, but the tags are the same, skip validation
+                existing = RCORDSubscriber.objects.filter(id=self.id)
+                if len(existing) > 0 and existing[0].c_tag == self.c_tag and existing[0].s_tag == self.s_tag and existing[0].id == self.id:
+                    is_update_with_same_tag = True
+
+            id = self.get_used_s_c_tag_subscriber_id()
+            if None != id and not is_update_with_same_tag:
+                raise XOSValidationError("The c_tag(%s) and s_tag(%s) pair you specified,has already been used by Subscriber with Id (%s)" % (self.c_tag,self.s_tag,id))
+
+        if not self.c_tag:
             self.c_tag = self.generate_c_tag()
 
-        if not hasattr(self, "s_tag") or not self.s_tag:
+        elif not self.s_tag:
             self.s_tag = self.generate_s_tag()
 
         self.set_owner()
