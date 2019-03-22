@@ -45,6 +45,29 @@
       "revId": "280057a26f3559209876ddce934f1a51b21bd4a4",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c9e5801_5612abbc",
+        "filename": "xos/synchronizer/models/models.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2019-03-22T16:48:21Z",
+      "side": 1,
+      "message": "I think we can drop the `hasattr` checks on s_tag and c_tag throughout, as these variables always exist in the class.",
+      "range": {
+        "startLine": 152,
+        "startChar": 11,
+        "endLine": 152,
+        "endChar": 33
+      },
+      "revId": "280057a26f3559209876ddce934f1a51b21bd4a4",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
