@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5e248d6d_06201e22",
+        "filename": "xos/synchronizer/models/models.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1000514
+      },
+      "writtenOn": "2019-03-25T04:00:12Z",
+      "side": 1,
+      "message": "Yes. Will remove this TODO comment now. Thanks.",
+      "parentUuid": "0eb6af56_811f180d",
+      "range": {
+        "startLine": 106,
+        "startChar": 8,
+        "endLine": 106,
+        "endChar": 70
+      },
+      "revId": "280057a26f3559209876ddce934f1a51b21bd4a4",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "71a74873_7cef546d",
         "filename": "xos/synchronizer/models/models.py",
         "patchSetId": 2
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "c0dee663_b9d285f7",
+        "filename": "xos/synchronizer/models/models.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1000514
+      },
+      "writtenOn": "2019-03-25T04:00:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "71a74873_7cef546d",
+      "range": {
+        "startLine": 119,
+        "startChar": 12,
+        "endLine": 119,
+        "endChar": 21
+      },
+      "revId": "280057a26f3559209876ddce934f1a51b21bd4a4",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5c9e5801_5612abbc",
         "filename": "xos/synchronizer/models/models.py",
         "patchSetId": 2
@@ -59,6 +107,30 @@
       "writtenOn": "2019-03-22T16:48:21Z",
       "side": 1,
       "message": "I think we can drop the `hasattr` checks on s_tag and c_tag throughout, as these variables always exist in the class.",
+      "range": {
+        "startLine": 152,
+        "startChar": 11,
+        "endLine": 152,
+        "endChar": 33
+      },
+      "revId": "280057a26f3559209876ddce934f1a51b21bd4a4",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b01d537_f1289f6b",
+        "filename": "xos/synchronizer/models/models.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1000514
+      },
+      "writtenOn": "2019-03-25T04:00:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c9e5801_5612abbc",
       "range": {
         "startLine": 152,
         "startChar": 11,
