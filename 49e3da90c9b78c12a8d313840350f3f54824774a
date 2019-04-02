@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e727a7a_24b51637",
+        "filename": "Dockerfile.synchronizer",
+        "patchSetId": 5
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-04-02T15:31:25Z",
+      "side": 1,
+      "message": "rcord",
+      "range": {
+        "startLine": 25,
+        "startChar": 37,
+        "endLine": 25,
+        "endChar": 40
+      },
+      "revId": "49e3da90c9b78c12a8d313840350f3f54824774a",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    }
+  ]
+}
