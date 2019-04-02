@@ -14,8 +14,8 @@
 # limitations under the License.
 
 
-import json
 from xosapi.orm import ORMWrapper, register_convenience_wrapper
+
 
 class ORMWrapperRCORDSubscriber(ORMWrapper):
     @property
@@ -24,7 +24,7 @@ class ORMWrapperRCORDSubscriber(ORMWrapper):
         for link in links:
             # FIXME: hardcoded service dependency
             # cast from ServiceInstance to VOLTServiceInstance
-            volts = self.stub.VOLTServiceInstance.objects.filter(id = link.provider_service_instance.id)
+            volts = self.stub.VOLTServiceInstance.objects.filter(id=link.provider_service_instance.id)
             if volts:
                 return volts[0]
         return None
@@ -37,5 +37,6 @@ class ORMWrapperRCORDSubscriber(ORMWrapper):
                        "uplink_speed",
                        "downlink_speed",
                        "status")
+
 
 register_convenience_wrapper("RCORDSubscriber", ORMWrapperRCORDSubscriber)

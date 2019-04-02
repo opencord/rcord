@@ -16,6 +16,7 @@
 from xossynchronizer.modelaccessor import ServiceInstanceLink, model_accessor
 from xossynchronizer.model_policies.policy import Policy
 
+
 class RCORDSubscriberPolicy(Policy):
     model_name = "RCORDSubscriber"
 
@@ -25,7 +26,9 @@ class RCORDSubscriberPolicy(Policy):
     def handle_update(self, si):
 
         if si.status == "pre-provisioned":
-            self.logger.debug("MODEL_POLICY: Skipping chain creation as RCORDSubscriber %s is in 'pre-provisioned' state" % si.id)
+            self.logger.debug(
+                "MODEL_POLICY: Skipping chain creation as RCORDSubscriber %s is in 'pre-provisioned' state" %
+                si.id)
             return
 
         chain = si.subscribed_links.all()
@@ -37,7 +40,9 @@ class RCORDSubscriberPolicy(Policy):
                 # delete chain
                 self.logger.debug("MODEL_POLICY: deleting RCORDSubscriber chain from %s" % si.id, status=si.status)
                 for link in chain:
-                    self.logger.debug("Removing link %s" % link.id, provider_service=link.provider_service_instance.leaf_model, subscriber_service=link.subscriber_service_instance.leaf_model)
+                    self.logger.debug("Removing link %s" % link.id,
+                                      provider_service=link.provider_service_instance.leaf_model,
+                                      subscriber_service=link.subscriber_service_instance.leaf_model)
                     link.delete()
                     link.provider_service_instance.leaf_model.delete()
 

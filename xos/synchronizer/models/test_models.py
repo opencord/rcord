@@ -13,24 +13,29 @@
 # limitations under the License.
 
 import unittest
-import os, sys
+import os
+import sys
 from mock import patch, Mock, MagicMock
 
-test_path=os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-service_dir=os.path.join(test_path, "../../../..")
-xos_dir=os.path.join(test_path, "../../..")
+test_path = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+service_dir = os.path.join(test_path, "../../../..")
+xos_dir = os.path.join(test_path, "../../..")
 if not os.path.exists(os.path.join(test_path, "new_base")):
-    xos_dir=os.path.join(test_path, "../../../../../../orchestration/xos/xos")
-    services_dir=os.path.join(xos_dir, "../../xos_services")
+    xos_dir = os.path.join(test_path, "../../../../../../orchestration/xos/xos")
+    services_dir = os.path.join(xos_dir, "../../xos_services")
 
 # mocking XOS exception, as they're based in Django
+
+
 class Exceptions:
     XOSValidationError = Exception
     XOSProgrammingError = Exception
     XOSPermissionDenied = Exception
 
+
 class XOS:
     exceptions = Exceptions
+
 
 class TestRCORDModels(unittest.TestCase):
     def setUp(self):
@@ -51,7 +56,6 @@ class TestRCORDModels(unittest.TestCase):
         self.models_decl.RCORDIpAddress_decl.objects = Mock()
         self.models_decl.RCORDIpAddress_decl.objects.filter.return_value = []
 
-
         modules = {
             'xos.exceptions': self.xos.exceptions,
             'models_decl': self.models_decl
@@ -68,7 +72,7 @@ class TestRCORDModels(unittest.TestCase):
 
         self.rcord_subscriber = RCORDSubscriber()
         self.rcord_subscriber.deleted = False
-        self.rcord_subscriber.id = None # this is a new model
+        self.rcord_subscriber.id = None  # this is a new model
         self.rcord_subscriber.is_new = True
         self.rcord_subscriber.onu_device = "BRCM1234"
         self.rcord_subscriber.c_tag = 111
@@ -80,7 +84,7 @@ class TestRCORDModels(unittest.TestCase):
         self.rcord_subscriber.owner.provider_services = [self.volt]
 
         self.rcord_ip = RCORDIpAddress()
-        self.rcord_ip.subscriber = 1;
+        self.rcord_ip.subscriber = 1
 
     def tearDown(self):
         sys.path = self.sys_path_save
@@ -184,7 +188,8 @@ class TestRCORDModels(unittest.TestCase):
         with self.assertRaises(Exception) as e:
             self.rcord_subscriber.save()
 
-        self.assertEqual(e.exception.message, "The c_tag(111) and s_tag(222) pair you specified,has already been used by Subscriber with Id (123)")
+        self.assertEqual(e.exception.message,
+                         "The c_tag(111) and s_tag(222) pair you specified,has already been used by Subscriber with Id (123)")
         self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
 
     def test_validate_c_tag_on_update(self):

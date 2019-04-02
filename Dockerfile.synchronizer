@@ -17,8 +17,14 @@
 
 # xosproject/rcord-synchronizer
 
-FROM xosproject/xos-synchronizer-base:3.0.0
+FROM xosproject/alpine-grpc-base:0.9.0
 
+# Install pip packages
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt \
+ && pip freeze > /var/xos/pip_freeze_rcord_service_`date -u +%Y%m%dT%H%M%S`
+
+# Copy files
 COPY xos/synchronizer /opt/xos/synchronizers/rcord
 COPY VERSION /opt/xos/synchronizers/rcord/
 
@@ -55,4 +61,4 @@ LABEL org.label-schema.schema-version=$org_label_schema_schema_version \
       org.opencord.component.xos.vcs-url=$org_opencord_component_xos_vcs_url \
       org.opencord.component.xos.vcs-ref=$org_opencord_component_xos_vcs_ref
 
-CMD bash -c "python rcord-synchronizer.py"
+CMD ["/usr/bin/python", "/opt/xos/synchronizers/rcord/rcord-synchronizer.py"]
