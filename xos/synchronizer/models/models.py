@@ -16,12 +16,14 @@ import re
 import socket
 import random
 
-from xos.exceptions import XOSValidationError, XOSProgrammingError, XOSPermissionDenied
+from xos.exceptions import XOSValidationError, XOSProgrammingError
 from models_decl import RCORDService_decl, RCORDSubscriber_decl, RCORDIpAddress_decl
+
 
 class RCORDService(RCORDService_decl):
     class Meta:
         proxy = True
+
 
 class RCORDIpAddress(RCORDIpAddress_decl):
     class Meta:
@@ -39,6 +41,7 @@ class RCORDIpAddress(RCORDIpAddress_decl):
             raise XOSValidationError("The IP specified is not valid: %s" % self.ip)
         super(RCORDIpAddress, self).save(*args, **kwargs)
         return
+
 
 class RCORDSubscriber(RCORDSubscriber_decl):
 
@@ -105,7 +108,9 @@ class RCORDSubscriber(RCORDSubscriber_decl):
                     is_update_with_same_tag = True
 
             if self.c_tag in self.get_used_c_tags() and not is_update_with_same_tag:
-                raise XOSValidationError("The c_tag you specified (%s) has already been used on device %s" % (self.c_tag, self.onu_device))
+                raise XOSValidationError(
+                    "The c_tag you specified (%s) has already been used on device %s" %
+                    (self.c_tag, self.onu_device))
 
         if not hasattr(self, "c_tag") or not self.c_tag:
             self.c_tag = self.generate_c_tag()
@@ -115,10 +120,14 @@ class RCORDSubscriber(RCORDSubscriber_decl):
 
         self.set_owner()
 
-        if self.status != "pre-provisioned" and hasattr(self.owner.leaf_model, "access") and self.owner.leaf_model.access == "voltha" and not self.deleted:
+        if self.status != "pre-provisioned" and \
+                hasattr(self.owner.leaf_model, "access") and \
+                self.owner.leaf_model.access == "voltha" and \
+                not self.deleted:
 
             # if the access network is managed by voltha, validate that onu_device actually exist
-            volt_service = self.owner.provider_services[0].leaf_model # we assume RCORDService is connected only to the vOLTService
+            # we assume RCORDService is connected only to the vOLTService
+            volt_service = self.owner.provider_services[0].leaf_model
 
             if not volt_service.has_access_device(self.onu_device):
                 raise XOSValidationError("The onu_device you specified (%s) does not exists" % self.onu_device)

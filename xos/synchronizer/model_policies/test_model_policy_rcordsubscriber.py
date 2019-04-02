@@ -17,9 +17,11 @@ import unittest
 from mock import patch, Mock
 
 
-import os, sys
+import os
+import sys
 
-test_path=os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+test_path = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+
 
 class TestModelPolicyRCORDSubscriber(unittest.TestCase):
     def setUp(self):
@@ -38,7 +40,7 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
 
         import xossynchronizer.modelaccessor
         import mock_modelaccessor
-        reload(mock_modelaccessor) # in case nose2 loaded it in a previous test
+        reload(mock_modelaccessor)  # in case nose2 loaded it in a previous test
         reload(xossynchronizer.modelaccessor)      # in case nose2 loaded it in a previous test
 
         from xossynchronizer.modelaccessor import model_accessor
@@ -68,7 +70,7 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
         self.policy.handle_create(si)
 
         with patch.object(VOLTServiceInstance, "save", autospec=True) as save_volt, \
-             patch.object(ServiceInstanceLink, "save", autospec=True) as save_link:
+                patch.object(ServiceInstanceLink, "save", autospec=True) as save_link:
 
             self.policy.handle_create(si)
             self.assertEqual(save_link.call_count, 0)
@@ -78,9 +80,9 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
         si = self.si
         si.is_new = False
         si.subscribed_links.all.return_value = ["already", "have", "a", "chain"]
-        
+
         with patch.object(VOLTServiceInstance, "save", autospec=True) as save_volt, \
-             patch.object(ServiceInstanceLink, "save", autospec=True) as save_link:
+                patch.object(ServiceInstanceLink, "save", autospec=True) as save_link:
 
             self.policy.handle_create(si)
             self.assertEqual(save_link.call_count, 0)
@@ -100,7 +102,7 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
         si.owner.subscribed_dependencies.all.return_value = [service_dependency]
 
         with patch.object(VOLTServiceInstance, "save", autospec=True) as save_volt, \
-             patch.object(ServiceInstanceLink, "save", autospec=True) as save_link:
+                patch.object(ServiceInstanceLink, "save", autospec=True) as save_link:
 
             self.policy.handle_create(si)
             self.assertEqual(save_link.call_count, 1)
@@ -111,10 +113,9 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
         volt.name = "volt"
 
         link = ServiceInstanceLink()
-        link.subscriber_service_instance= self.si
+        link.subscriber_service_instance = self.si
         link.provider_service_instance = volt
         link.provider_service_instance.leaf_model = volt
-
 
         si = self.si
         si.is_new = False
@@ -122,7 +123,7 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
         si.subscribed_links.all.return_value = [link]
 
         with patch.object(VOLTServiceInstance, "delete", autospec=True) as delete_volt, \
-             patch.object(ServiceInstanceLink, "delete", autospec=True) as delete_link:
+                patch.object(ServiceInstanceLink, "delete", autospec=True) as delete_link:
 
             self.policy.handle_create(si)
             self.assertEqual(delete_link.call_count, 1)
