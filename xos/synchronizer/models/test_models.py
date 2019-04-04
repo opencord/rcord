@@ -31,6 +31,7 @@ class Exceptions:
     XOSValidationError = Exception
     XOSProgrammingError = Exception
     XOSPermissionDenied = Exception
+    XOSConfigurationError = Exception
 
 
 class XOS:
@@ -82,6 +83,7 @@ class TestRCORDModels(unittest.TestCase):
         self.rcord_subscriber.mac_address = "00:AA:00:00:00:01"
         self.rcord_subscriber.owner.leaf_model.access = "voltha"
         self.rcord_subscriber.owner.provider_services = [self.volt]
+        self.rcord_subscriber.list_of_unused_c_tags_for_s_tag = []
 
         self.rcord_ip = RCORDIpAddress()
         self.rcord_ip.subscriber = 1
@@ -228,7 +230,7 @@ class TestRCORDModels(unittest.TestCase):
         s.c_tag = "111"
         s.s_tag = "223"
         s.onu_device = "BRCM1234"
-
+        
         self.rcord_subscriber.get_same_onu_subscribers = Mock()
         self.rcord_subscriber.get_same_onu_subscribers.return_value = [s]
 
@@ -244,6 +246,71 @@ class TestRCORDModels(unittest.TestCase):
         self.assertGreater(self.rcord_subscriber.c_tag, 16)
         self.assertLess(self.rcord_subscriber.c_tag, 4097)
 
+        #Testing whether the random generation choses c_tag from the list provided
+        self.rcord_subscriber.c_tag = None
+        self.rcord_subscriber.s_tag = None
+        self.rcord_subscriber.unused_c_tags_for_s_tag = Mock()
+        self.rcord_subscriber.unused_c_tags_for_s_tag.return_value = [18,19]
+
+        self.rcord_subscriber.save()
+        self.models_decl.RCORDSubscriber_decl.save.assert_called()
+        self.assertGreater(self.rcord_subscriber.c_tag, 17)
+        self.assertLess(self.rcord_subscriber.c_tag, 20)
+
+        self.rcord_subscriber.c_tag = None
+        self.rcord_subscriber.s_tag = None
+
+        self.rcord_subscriber.save()
+        self.models_decl.RCORDSubscriber_decl.save.assert_called()
+        self.assertGreater(self.rcord_subscriber.c_tag, 16)
+        self.assertLess(self.rcord_subscriber.c_tag, 4096)
+
+    def test_unused_c_tags_for_s_tag(self):
+        s=[]
+        for i in range(16,4097):
+            d = Mock()
+            d.c_tag = i
+            d.s_tag = "222"
+            d.onu_device = "BRCM1234"
+            s.append(d)
+
+        self.rcord_subscriber.get_same_onu_subscribers = Mock()
+        self.rcord_subscriber.get_same_onu_subscribers.return_value = []
+        self.rcord_subscriber.get_same_s_c_tag_subscribers = Mock()
+        self.rcord_subscriber.get_same_s_c_tag_subscribers.return_value = []
+
+        self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = s
+        self.rcord_subscriber.s_tag = 222
+        self.rcord_subscriber.c_tag = None
+        with self.assertRaises(Exception) as e:
+            self.rcord_subscriber.save()
+        self.assertEqual(e.exception.message, "All the c_tags are exhausted for this s_tag: 222")
+        self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
+
+    def test_unused_s_tags_for_c_tag(self):
+        s=[]
+        for i in range(16,4097):
+            d = Mock()
+            d.s_tag = i
+            d.c_tag = "111"
+            d.onu_device = "BRCM1234"
+            s.append(d)
+
+        self.rcord_subscriber.get_same_onu_subscribers = Mock()
+        self.rcord_subscriber.get_same_onu_subscribers.return_value = []
+        self.rcord_subscriber.get_same_s_c_tag_subscribers = Mock()
+        self.rcord_subscriber.get_same_s_c_tag_subscribers.return_value = []
+
+        self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = s
+        self.rcord_subscriber.c_tag = 111
+        self.rcord_subscriber.s_tag = None
+        with self.assertRaises(Exception) as e:
+            self.rcord_subscriber.save()
+        self.assertEqual(e.exception.message, "All the s_tags are exhausted for this c_tag: 111")
+        self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
+
+
+
     def test_generate_s_tag(self):
         self.rcord_subscriber.s_tag = None
 
@@ -251,6 +318,7 @@ class TestRCORDModels(unittest.TestCase):
 
         self.models_decl.RCORDSubscriber_decl.save.assert_called()
         self.assertNotEqual(self.rcord_subscriber.s_tag, None)
+
 
     def test_provisioned_s_stag(self):
         self.rcord_subscriber.save()

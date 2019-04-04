@@ -16,9 +16,10 @@ import re
 import socket
 import random
 
-from xos.exceptions import XOSValidationError, XOSProgrammingError
+from xos.exceptions import XOSValidationError, XOSProgrammingError, XOSPermissionDenied, XOSConfigurationError
 from models_decl import RCORDService_decl, RCORDSubscriber_decl, RCORDIpAddress_decl, BandwidthProfile_decl
 
+range_of_tags = list(range(16,4096))
 
 class BandwidthProfile(BandwidthProfile_decl):
     class Meta:
@@ -67,8 +68,10 @@ class RCORDSubscriber(RCORDSubscriber_decl):
                 inner_service_instance.save(update_fields=["updated"])
 
     def generate_s_tag(self):
-        # NOTE what's the right way to generate an s_tag?
-        tag = random.randint(16, 4096)
+
+        # unused_s_tags_for_c_tag() this function will return a list of unused s_tags for that c_tag
+
+        tag = random.choice(self.unused_s_tags_for_c_tag())
  
         # Check that combination(c_tag,s_tag) is unique.
         # If the combination is not unique it will keep on calling this function recursively till it gets a unique combination.
@@ -81,8 +84,10 @@ class RCORDSubscriber(RCORDSubscriber_decl):
 
 
     def generate_c_tag(self):
-        # NOTE this method will loop if available c_tags are ended
-        tag = random.randint(16, 4096)
+
+        # unused_c_tags_for_s_tag() this function will return a list of unused c_tags for the given s_tag
+
+        tag = random.choice(self.unused_c_tags_for_s_tag())
 
         # Check that this random generated value is valid across given ONU-first check.
         # If the value is valid it will assign c_tag wth it and do second check.
@@ -104,6 +109,41 @@ class RCORDSubscriber(RCORDSubscriber_decl):
         else:
             return tag
 
+    def unused_c_tags_for_s_tag(self):
+
+        #This function will return a list of unused c_tags
+
+        #If there is no s_tag
+        global range_of_tags
+
+        #If there's a s_tag, then return unused c_tags for that s_tag
+        subscribers_with_same_s_tag = RCORDSubscriber.objects.filter(s_tag = self.s_tag)
+        used_c_tags = [s.c_tag for s in subscribers_with_same_s_tag]
+        if len(used_c_tags) == 0:
+            return range_of_tags
+        else:
+            list_of_unused_c_tags_for_s_tag = list(set(range_of_tags) - set(used_c_tags))
+            if len(list_of_unused_c_tags_for_s_tag) == 0:
+                raise XOSConfigurationError("All the c_tags are exhausted for this s_tag: %s"% self.s_tag)
+            else:
+                return list_of_unused_c_tags_for_s_tag
+
+    def unused_s_tags_for_c_tag(self):
+
+        #This function will return a list of unused s_tags
+
+        global range_of_tags
+        #If there's a c_tag, then return unused s_tags for that c_tag
+        subscribers_with_same_c_tag = RCORDSubscriber.objects.filter(c_tag = self.c_tag)
+        used_s_tags = [s.s_tag for s in subscribers_with_same_c_tag]
+        if len(used_s_tags) == 0:
+            return range_of_tags
+        else:
+            list_of_unused_s_tags_for_c_tag = list(set(range_of_tags) - set(used_s_tags))
+            if len(list_of_unused_s_tags_for_c_tag) == 0:
+                raise XOSConfigurationError("All the s_tags are exhausted for this c_tag: %s"% self.c_tag)
+            else:
+                return list_of_unused_s_tags_for_c_tag
     def get_same_onu_subscribers(self):
         return RCORDSubscriber.objects.filter(onu_device=self.onu_device)
 
@@ -170,6 +210,7 @@ class RCORDSubscriber(RCORDSubscriber_decl):
             id = self.get_used_s_c_tag_subscriber_id()
             if None != id and not is_update_with_same_tag:
                 raise XOSValidationError("The c_tag(%s) and s_tag(%s) pair you specified,has already been used by Subscriber with Id (%s)" % (self.c_tag,self.s_tag,id))
+                
 
         if not self.c_tag:
             self.c_tag = self.generate_c_tag()
@@ -194,3 +235,4 @@ class RCORDSubscriber(RCORDSubscriber_decl):
         super(RCORDSubscriber, self).save(*args, **kwargs)
         self.invalidate_related_objects()
         return
+                     
