@@ -17,7 +17,9 @@ message BandwidthProfile(XOSBase) {
     option description = "The Bandwidth Profile assinged to a residential subscriber";
 
     // TODO add help_text
-    required string name = 3;
+    required string name = 3 [
+        help_text = "Name of bandwidth profile",
+        max_length = 256];
     required int32 cir = 4;
     required int32 cbs = 5;
     required int32 eir = 6;
@@ -52,17 +54,22 @@ message RCORDSubscriber (ServiceInstance) {
         min_value = 0,
         max_value = 4096];
     required string onu_device = 13 [
-        help_text = "ONUDevice serial number"];
+        help_text = "ONUDevice serial number",
+        max_length = 256];
     optional string mac_address = 18 [
-        help_text = "Subscriber MAC Address"];
+        help_text = "Subscriber MAC Address",
+        max_length = 256];
 
     // operator specific fields
     optional string nas_port_id = 20 [
-        help_text = "NAS Port ID used in Radius to identify physical interface used to authenticate subscriber"];
+        help_text = "NAS Port ID used in Radius to identify physical interface used to authenticate subscriber",
+        max_length = 256];
     optional string circuit_id = 21 [
-        help_text = "Option 82 Circuit ID for DHCP relay agent"];
+        help_text = "Option 82 Circuit ID for DHCP relay agent",
+        max_length = 256];
     optional string remote_id = 22 [
-        help_text = "Option 82 Remote ID for DHCP relay agent"];
+        help_text = "Option 82 Remote ID for DHCP relay agent",
+        max_length = 256];
 
     required manytoone upstream_bps->BandwidthProfile:us_subscriber = 31:1001 [
         help_text = "The subscriber the IP address belongs to"];
@@ -83,5 +90,5 @@ message RCORDIpAddress(XOSBase) {
         unique_with = "subscriber"];
     optional string description = 3 [
         help_text = "A short description of the IP address",
-        max_length = 254];
+        text = True];
 }
