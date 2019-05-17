@@ -25,6 +25,7 @@ class RCORDSubscriberPolicy(Policy):
 
     def handle_update(self, si):
 
+        # FIXME if the status is now pre-provisioned but the subscriber had a service-chain it needs to be removed
         if si.status == "pre-provisioned":
             self.logger.debug(
                 "MODEL_POLICY: Skipping chain creation as RCORDSubscriber %s is in 'pre-provisioned' state" %
