@@ -70,6 +70,10 @@ message RCORDSubscriber (ServiceInstance) {
     optional string remote_id = 22 [
         help_text = "Option 82 Remote ID for DHCP relay agent",
         max_length = 256];
+    optional int32 tech_profile_id = 23 [
+        help_text = "Technology profile id to be used along with Technology type to retreive the profile",
+        min_value = 0,
+        max_value = 65535];
 
     required manytoone upstream_bps->BandwidthProfile:us_subscriber = 31:1001 [
         help_text = "The subscriber the IP address belongs to"];
