@@ -55,7 +55,8 @@ message RCORDSubscriber (ServiceInstance) {
         max_value = 4096];
     required string onu_device = 13 [
         help_text = "ONUDevice serial number",
-        max_length = 256];
+        max_length = 256,
+        tosca_key = True];
     optional string mac_address = 18 [
         help_text = "Subscriber MAC Address",
         max_length = 256];
