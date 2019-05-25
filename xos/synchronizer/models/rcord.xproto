@@ -5,6 +5,8 @@ option legacy="True";
 message RCORDService (Service) {
     option verbose_name = "RCORD Service";
     option description = "Service that manages residential subscribers";
+    option sync_unimplemented = "True";
+    option policy_unimplemented = "False";
 
     required string access = 11 [
         help_text = "Name of service that is managing the Access Network",
@@ -15,6 +17,8 @@ message RCORDService (Service) {
 message BandwidthProfile(XOSBase) {
     option verbose_name = "Bandwidth Profile";
     option description = "The Bandwidth Profile assinged to a residential subscriber";
+    option sync_unimplemented = "True";
+    option policy_unimplemented = "False";
 
     // TODO add help_text
     required string name = 3 [
@@ -32,6 +36,8 @@ message RCORDSubscriber (ServiceInstance) {
     option verbose_name = "RCORD Subscriber";
     option owner_class_name = "RCORDService";
     option description = "A residential subscriber";
+    option sync_unimplemented = "True";
+    option policy_unimplemented = "False";
 
     // vsg related configurations
     optional manytoone creator->User:created_rcord_subscribers = 15 [
@@ -85,6 +91,8 @@ message RCORDSubscriber (ServiceInstance) {
 message RCORDIpAddress(XOSBase) {
     option verbose_name = "IP address";
     option description = "An IP Address assinged to a residential subscriber";
+    option sync_unimplemented = "True";
+    option policy_unimplemented = "False";
 
     required manytoone subscriber->RCORDSubscriber:ips = 1:1001 [
         help_text = "The subscriber the IP address belongs to",
