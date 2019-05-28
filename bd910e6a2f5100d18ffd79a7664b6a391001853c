@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "775c0e03_c93a0b53",
+        "filename": "xos/synchronizer/models/rcord.xproto",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000007
+      },
+      "writtenOn": "2019-05-28T17:51:09Z",
+      "side": 1,
+      "message": "The RCORDService does not have a model_policy.",
+      "range": {
+        "startLine": 9,
+        "startChar": 4,
+        "endLine": 9,
+        "endChar": 42
+      },
+      "revId": "bd910e6a2f5100d18ffd79a7664b6a391001853c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb654314_6a78562d",
+        "filename": "xos/synchronizer/models/rcord.xproto",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1000007
+      },
+      "writtenOn": "2019-05-28T17:51:09Z",
+      "side": 1,
+      "message": "The BandwitdthProfile does not have a model_policy.",
+      "range": {
+        "startLine": 21,
+        "startChar": 4,
+        "endLine": 21,
+        "endChar": 42
+      },
+      "revId": "bd910e6a2f5100d18ffd79a7664b6a391001853c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "255e5685_7c7011bd",
+        "filename": "xos/synchronizer/models/rcord.xproto",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1000007
+      },
+      "writtenOn": "2019-05-28T17:51:09Z",
+      "side": 1,
+      "message": "The RCORDIpAddress does not have a model_policy.",
+      "range": {
+        "startLine": 95,
+        "startChar": 4,
+        "endLine": 95,
+        "endChar": 42
+      },
+      "revId": "bd910e6a2f5100d18ffd79a7664b6a391001853c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
