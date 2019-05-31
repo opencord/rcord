@@ -25,48 +25,36 @@ class RCORDSubscriberPolicy(Policy):
 
     def handle_update(self, si):
 
-        # FIXME if the status is now pre-provisioned but the subscriber had a service-chain it needs to be removed
-        if si.status == "pre-provisioned":
-            self.logger.debug(
-                "MODEL_POLICY: Skipping chain creation as RCORDSubscriber %s is in 'pre-provisioned' state" %
-                si.id)
-            return
-
         chain = si.subscribed_links.all()
 
         # Already has a chain
-        if len(chain) > 0:
-            self.logger.debug("MODEL_POLICY: RCORDSubscriber %s is already part of a chain" % si.id)
-            if si.status == "awaiting-auth" or si.status == "auth-failed" or si.status == "disabled":
-                # delete chain
-                self.logger.debug("MODEL_POLICY: deleting RCORDSubscriber chain from %s" % si.id, status=si.status)
-                for link in chain:
-                    self.logger.debug("Removing link %s" % link.id,
-                                      provider_service=link.provider_service_instance.leaf_model,
-                                      subscriber_service=link.subscriber_service_instance.leaf_model)
-                    link.delete()
-                    link.provider_service_instance.leaf_model.delete()
+        if si.status != "enabled" and  len(chain) > 0:
+            # delete chain
+            self.logger.debug("MODEL_POLICY: deleting RCORDSubscriber chain from %s" % si.id, status=si.status)
+            for link in chain:
+                self.logger.debug("Removing link %s" % link.id,
+                                  provider_service=link.provider_service_instance.leaf_model,
+                                  subscriber_service=link.subscriber_service_instance.leaf_model)
+                link.delete()
+                link.provider_service_instance.leaf_model.delete()
 
-        else:
-            if si.status != "enabled":
-                self.logger.debug("MODEL_POLICY: NOT creating RCORDSubscriber chain for %s" % si.id, status=si.status)
-            else:
-                self.logger.debug("MODEL_POLICY: creating RCORDSubscriber chain for %s" % si.id, status=si.status)
-                # if it does not have a chain,
-                # Find links to the next element in the service chain
-                # and create one
-                links = si.owner.subscribed_dependencies.all()
+        elif si.status == "enabled":
 
-                for link in links:
-                    si_class = link.provider_service.get_service_instance_class_name()
-                    self.logger.info("MODEL_POLICY: RCORDSubscriber %s creating %s" % (si, si_class))
+            self.logger.debug("MODEL_POLICY: creating RCORDSubscriber chain for %s" % si.id, status=si.status)
+            # if it does not have a chain,
+            # Find links to the next element in the service chain
+            # and create one
+            links = si.owner.subscribed_dependencies.all()
 
-                    eastbound_si_class = model_accessor.get_model_class(si_class)
-                    eastbound_si = eastbound_si_class()
-                    eastbound_si.owner_id = link.provider_service_id
-                    eastbound_si.save()
-                    link = ServiceInstanceLink(provider_service_instance=eastbound_si, subscriber_service_instance=si)
-                    link.save()
+            for link in links:
+                si_class = link.provider_service.get_service_instance_class_name()
+                self.logger.info("MODEL_POLICY: RCORDSubscriber %s creating %s" % (si, si_class))
+
+                provider_service = link.provider_service.leaf_model
+
+                valid_provider_service_instance = provider_service.validate_links(si)
+                if not valid_provider_service_instance:
+                    provider_service.acquire_service_instance(si)
 
     def handle_delete(self, si):
         pass

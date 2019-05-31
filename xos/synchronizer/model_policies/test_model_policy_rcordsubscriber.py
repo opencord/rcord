@@ -60,13 +60,15 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
 
         self.policy = RCORDSubscriberPolicy(model_accessor=self.model_accessor)
         self.si = Mock(name="myTestSubscriber")
+        self.si.subscribed_links.all.return_value = []
 
     def tearDown(self):
         sys.path = self.sys_path_save
 
-    def test_update_pre_provisione(self):
+    def test_update_pre_provisioned(self):
         si = self.si
         si.status = "pre-provisioned"
+
         self.policy.handle_create(si)
 
         with patch.object(VOLTServiceInstance, "save", autospec=True) as save_volt, \
@@ -79,34 +81,41 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
     def test_update_and_do_nothing(self):
         si = self.si
         si.is_new = False
-        si.subscribed_links.all.return_value = ["already", "have", "a", "chain"]
+        si.status = "enabled"
 
-        with patch.object(VOLTServiceInstance, "save", autospec=True) as save_volt, \
-                patch.object(ServiceInstanceLink, "save", autospec=True) as save_link:
+        next_si = Mock()
 
-            self.policy.handle_create(si)
-            self.assertEqual(save_link.call_count, 0)
-            self.assertEqual(save_volt.call_count, 0)
+        link = Mock()
+        link.provider_service.validate_links = Mock(return_value=next_si)
+        link.provider_service.acquire_service_instance = Mock()
+        link.provider_service.leaf_model = link.provider_service
+
+        si.owner.subscribed_dependencies.all.return_value = [link]
+
+        self.policy.handle_create(si)
+
+        link.provider_service.validate_links.assert_called_with(si)
+        link.provider_service.acquire_service_instance.assert_not_called()
 
     def test_create_chain(self):
-        volt = Mock()
-        volt.get_service_instance_class_name.return_value = "VOLTServiceInstance"
-
-        service_dependency = Mock()
-        service_dependency.provider_service = volt
-
         si = self.si
         si.is_new = True
         si.status = "enabled"
-        si.subscribed_links.all.return_value = []
-        si.owner.subscribed_dependencies.all.return_value = [service_dependency]
 
-        with patch.object(VOLTServiceInstance, "save", autospec=True) as save_volt, \
-                patch.object(ServiceInstanceLink, "save", autospec=True) as save_link:
+        next_si = Mock()
 
-            self.policy.handle_create(si)
-            self.assertEqual(save_link.call_count, 1)
-            self.assertEqual(save_volt.call_count, 1)
+        link = Mock()
+        link.provider_service.validate_links = Mock(return_value=None)
+        link.provider_service.acquire_service_instance = Mock()
+        link.provider_service.leaf_model = link.provider_service
+        link.provider_service.get_service_instance_class_name.return_value = "TestClass"
+
+        si.owner.subscribed_dependencies.all.return_value = [link]
+
+        self.policy.handle_create(si)
+
+        link.provider_service.validate_links.assert_called_with(si)
+        link.provider_service.acquire_service_instance.assert_called_with(si)
 
     def test_remove_chain(self):
         volt = VOLTServiceInstance()
