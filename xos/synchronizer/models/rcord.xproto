@@ -33,6 +33,7 @@ message RCORDSubscriber (ServiceInstance) {
     option owner_class_name = "RCORDService";
     option description = "A residential subscriber";
     option policy_implemented = "True";
+    option sync_implemented = "True";
 
     // vsg related configurations
     optional manytoone creator->User:created_rcord_subscribers = 15 [
