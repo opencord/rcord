@@ -86,7 +86,7 @@ class TestModelPolicyRCORDSubscriber(unittest.TestCase):
         next_si = Mock()
 
         link = Mock()
-        link.provider_service.validate_links = Mock(return_value=next_si)
+        link.provider_service.validate_links = Mock(return_value=[next_si])
         link.provider_service.acquire_service_instance = Mock()
         link.provider_service.leaf_model = link.provider_service
 
