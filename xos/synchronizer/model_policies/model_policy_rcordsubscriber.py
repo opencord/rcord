@@ -28,7 +28,7 @@ class RCORDSubscriberPolicy(Policy):
         chain = si.subscribed_links.all()
 
         # Already has a chain
-        if si.status != "enabled" and  len(chain) > 0:
+        if si.status != "enabled" and len(chain) > 0:
             # delete chain
             self.logger.debug("MODEL_POLICY: deleting RCORDSubscriber chain from %s" % si.id, status=si.status)
             for link in chain:
@@ -55,6 +55,9 @@ class RCORDSubscriberPolicy(Policy):
                 valid_provider_service_instance = provider_service.validate_links(si)
                 if not valid_provider_service_instance:
                     provider_service.acquire_service_instance(si)
+                else:
+                    for si in valid_provider_service_instance:
+                        si.save(always_update_timestamp=True)
 
     def handle_delete(self, si):
         pass
