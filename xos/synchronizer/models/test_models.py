@@ -65,9 +65,12 @@ class TestRCORDModels(unittest.TestCase):
         self.module_patcher = patch.dict('sys.modules', modules)
         self.module_patcher.start()
 
-        self.volt = Mock()
-
         from models import RCORDSubscriber, RCORDIpAddress
+
+        self.volt = Mock(name="vOLT")
+        self.volt.leaf_model.name = "vOLT"
+        self.volt.get_olt_technology_from_unu_sn.return_value = "xgspon"
+
 
         self.rcord_subscriber_class = RCORDSubscriber
 
@@ -85,8 +88,11 @@ class TestRCORDModels(unittest.TestCase):
         self.rcord_subscriber.owner.provider_services = [self.volt]
         self.rcord_subscriber.list_of_unused_c_tags_for_s_tag = []
 
+
         self.rcord_ip = RCORDIpAddress()
         self.rcord_ip.subscriber = 1
+
+    # TODO add a test for validate_tech_profile_id
 
     def tearDown(self):
         sys.path = self.sys_path_save

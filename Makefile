@@ -54,13 +54,13 @@ docker-push:
 
 test: test-unit test-migration test-xproto
 
-test-unit:
+test-unit: venv-service
 	tox
 
 venv-service:
 	virtualenv $@;\
     source ./$@/bin/activate ; set -u ;\
-    pip install -r requirements.txt xosmigrate~=3.2.6
+    pip install -r requirements.txt xosmigrate~=3.2.6 django
 
 create-migration: venv-service
 	source ./venv-service/bin/activate; set -u;\
