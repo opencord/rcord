@@ -15,7 +15,7 @@
 import re
 import socket
 import random
-
+from django.core.exceptions import ObjectDoesNotExist
 from xos.exceptions import XOSValidationError, XOSProgrammingError, XOSPermissionDenied, XOSConfigurationError
 from models_decl import RCORDService_decl, RCORDSubscriber_decl, RCORDIpAddress_decl, BandwidthProfile_decl
 
@@ -81,7 +81,6 @@ class RCORDSubscriber(RCORDSubscriber_decl):
             return self.generate_s_tag()
         else:
             return tag
-
 
     def generate_c_tag(self):
 
@@ -165,6 +164,26 @@ class RCORDSubscriber(RCORDSubscriber_decl):
         else:
             return None 
 
+    def validate_tech_profile_id(self):
+        if self.owner.leaf_model.access != "voltha":
+            # if we're not using VOLTHA we don't need to validate this
+            return True
+
+        volt = None
+        for ps in self.owner.provider_services:
+            provider_service = ps.leaf_model
+            if provider_service.name.lower() == "volt":
+                volt = provider_service
+
+        technology = volt.get_olt_technology_from_unu_sn(self.onu_device)
+
+        try:
+            tp = volt.get_tech_profile(technology, self.tech_profile_id)
+            return True
+        except ObjectDoesNotExist:
+            return False
+
+
     def save(self, *args, **kwargs):
         self.validate_unique_service_specific_id(none_okay=True)
 
@@ -231,6 +250,10 @@ class RCORDSubscriber(RCORDSubscriber_decl):
 
             if not volt_service.has_access_device(self.onu_device):
                 raise XOSValidationError("The onu_device you specified (%s) does not exists" % self.onu_device)
+
+        # validate that the tech_profile_id actually exists
+        if not self.validate_tech_profile_id():
+            raise XOSValidationError("The technology profile you specified [%s] does not exist" % self.tech_profile_id)
 
         super(RCORDSubscriber, self).save(*args, **kwargs)
         self.invalidate_related_objects()
