@@ -25,6 +25,10 @@ class RCORDSubscriberPolicy(Policy):
 
     def handle_update(self, si):
 
+        # FIXME when we delete a subscriber this method is called but it shouldn't be
+
+        # FIXME ignore IP address updates
+
         chain = si.subscribed_links.all()
 
         # Already has a chain
