@@ -251,9 +251,9 @@ class RCORDSubscriber(RCORDSubscriber_decl):
             if not volt_service.has_access_device(self.onu_device):
                 raise XOSValidationError("The onu_device you specified (%s) does not exists" % self.onu_device)
 
-        # validate that the tech_profile_id actually exists
-        if not self.validate_tech_profile_id():
-            raise XOSValidationError("The technology profile you specified [%s] does not exist" % self.tech_profile_id)
+            # if the access network is managed by voltha, validate that the tech_profile_id actually exists
+            if not self.validate_tech_profile_id():
+                raise XOSValidationError("The technology profile you specified [%s] does not exist" % self.tech_profile_id)
 
         super(RCORDSubscriber, self).save(*args, **kwargs)
         self.invalidate_related_objects()

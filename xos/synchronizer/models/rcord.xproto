@@ -63,9 +63,9 @@ message RCORDSubscriber (ServiceInstance) {
         help_text = "Subscriber MAC Address",
         max_length = 256];
     required int32 tech_profile_id = 23 [
-        help_text = "Technology profile id to be used along with Technology type to retreive the profile",
-        min_value = 0,
-        max_value = 65535];
+        help_text = "Technology profile id to be used along with Technology type to retreive the profile. Make sure that the profile ID specified exists for the technology this subscriber's OLT is using.",
+        min_value = 64,
+        max_value = 255];
 
     // operator specific fields
     optional string nas_port_id = 20 [
