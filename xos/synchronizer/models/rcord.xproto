@@ -90,12 +90,15 @@ message RCORDIpAddress(XOSBase) {
 
     required manytoone subscriber->RCORDSubscriber:ips = 1:1001 [
         help_text = "The subscriber the IP address belongs to",
-        db_index = True];
+        db_index = True,
+        feedback_state = True];
     required string ip = 2 [
         help_text = "The unique IP address (either IPv4 or IPv6 / netmask)",
         max_length = 52,
+        feedback_state = True,
         unique_with = "subscriber"];
     optional string description = 3 [
         help_text = "A short description of the IP address",
+        feedback_state = True,
         text = True];
 }
