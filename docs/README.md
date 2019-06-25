@@ -26,12 +26,16 @@ The R-CORD service has the following three models:
 
 ## Example Tosca - Create a Subscriber
 
-The following TOSCA recipe creates an `RCORDSubscriber`:
+The following TOSCA recipe creates:
+
+- `RCORDSubscriber`
+- `BandwidthProfile`
 
 ```yaml
 tosca_definitions_version: tosca_simple_yaml_1_0
 imports:
   - custom_types/rcordsubscriber.yaml
+  - custom_types/bandwidthprofile.yaml
 
 description: Pre-provsion a subscriber
 
@@ -39,21 +43,40 @@ topology_template:
   node_templates:
 
     # Pre-provision the subscriber
+    high_speed_bp:
+      type: tosca.nodes.BandwidthProfile
+      properties:
+         air: 2000
+         cbs: 2000
+         cir: 2000
+         ebs: 2000
+         eir: 2000
+         name: Bronze
+
+    # Pre-provision the subscriber the subscriber
     onf_subscriber_1:
       type: tosca.nodes.RCORDSubscriber
       properties:
-        name: Sub_BRCM22222222
+        name: Sub_ALPHe3d1cfde
         status: pre-provisioned
-        c_tag: 111
+        c_tag: 222
         s_tag: 111
-        onu_device: BRCM22222222
-        nas_port_id : "PON 1/1/03/1:1.1.1"
-        circuit_id: foo1
-        remote_id: bar1
+        onu_device: ALPHe3d1cfde
+        nas_port_id : "PON 1/1/04/1:1.1.1"
+        circuit_id: foo2
+        remote_id: bar2
+        tech_profile_id: 64
+      requirements:
+        - upstream_bps:
+            node: high_speed_bp
+            relationship: tosca.relationships.BelongsToOne
+        - downstream_bps:
+            node: high_speed_bp
+            relationship: tosca.relationships.BelongsToOne
 ```
 
 > NOTE: an `onu_device` with the provided serial number must exist in the system.
-> For more informations about ONU Devices, please refer to the
+> For more information about ONU Devices, please refer to the
 > [vOLTService](../olt-service/README.md) guide.
 
 ## Integration with other Services
@@ -66,6 +89,9 @@ If the R-CORD Service is configured with `access=voltha`, the following requirem
 - The `provider_service` exposes an API called `has_access_device(onu_serial_number)`
   that returns a boolean. This is used to validate that the ONU the subscriber
   is pointing to really exists.
+- The `provider_service` exposes API called `get_olt_technology_from_unu_sn(onu_serial_number)` and `get_tech_profile(technology, tech_profile_id)`
+  that returns a boolean. This is used to validate that the Technology Profile the subscriber
+  is pointing to really exists. See [Technology Profile Management](https://github.com/opencord/voltha/tree/master/common/tech_profile) for more informations.
 
 ## Synchronizer workflow
 
