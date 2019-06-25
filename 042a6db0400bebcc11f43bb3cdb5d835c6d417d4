@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "faf09088_599b428e",
+        "filename": "docs/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2019-06-25T22:57:21Z",
+      "side": 1,
+      "message": "information",
+      "range": {
+        "startLine": 93,
+        "startChar": 145,
+        "endLine": 93,
+        "endChar": 157
+      },
+      "revId": "042a6db0400bebcc11f43bb3cdb5d835c6d417d4",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
