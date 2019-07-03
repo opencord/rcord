@@ -246,10 +246,12 @@ class RCORDSubscriber(RCORDSubscriber_decl):
 
             # if the access network is managed by voltha, validate that onu_device actually exist
             # we assume RCORDService is connected only to the vOLTService
-            volt_service = self.owner.provider_services[0].leaf_model
-
-            if not volt_service.has_access_device(self.onu_device):
-                raise XOSValidationError("The onu_device you specified (%s) does not exists" % self.onu_device)
+            for ps in self.owner.provider_services:
+                provider_service = ps.leaf_model
+                if provider_service.name.lower() == "volt":
+                    volt_service = provider_service
+                    if not volt_service.has_access_device(self.onu_device):
+                       raise XOSValidationError("The onu_device you specified (%s) does not exists" % self.onu_device)
 
             # if the access network is managed by voltha, validate that the tech_profile_id actually exists
             if not self.validate_tech_profile_id():
