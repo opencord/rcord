@@ -3,7 +3,7 @@ option app_label = "rcord";
 option legacy="True";
 
 message RCORDService (Service) {
-    option verbose_name = "RCORD Service";
+    option verbose_name = "Subscriber Service";
     option description = "Service that manages residential subscribers";
 
     required string access = 11 [
@@ -20,16 +20,16 @@ message BandwidthProfile(XOSBase) {
     required string name = 3 [
         help_text = "Name of bandwidth profile",
         max_length = 256];
-    required int32 cir = 4;
-    required int32 cbs = 5;
-    required int32 eir = 6;
-    required int32 ebs = 7;
-    required int32 air = 8;
+    required int32 cir = 4 [help_text = "Committed Information Rate"];
+    required int32 cbs = 5 [help_text = "Committed Burst Rate"];
+    required int32 eir = 6 [help_text = "Excess Information Rate"];
+    required int32 ebs = 7 [help_text = "Excess Burst Rate"];
+    required int32 air = 8 [help_text = "Access Information Rate"];
 }
 
 message RCORDSubscriber (ServiceInstance) {
     option kind = "RCORDSubscriber";
-    option verbose_name = "RCORD Subscriber";
+    option verbose_name = "Subscriber";
     option owner_class_name = "RCORDService";
     option description = "A residential subscriber";
     option policy_implemented = "True";
