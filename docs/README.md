@@ -95,14 +95,15 @@ The R-CORD Service has no western neighbors, as it is always the root of a subsc
 
 If the R-CORD Service is configured with `access=voltha`, the following requirements apply:
 
-- There is only one `provider_service` linked to the R-CORD Servioce.
-- The `provider_service` exposes an API called `has_access_device(onu_serial_number)`
+- There are two `provider_service` linked to the R-CORD Servioce.
+- First one is `VOLT_SERVICE` which exposes an API called `has_access_device(onu_serial_number)`
   that returns a boolean. This is used to validate that the ONU the subscriber
   is pointing to really exists.
-- The `provider_service` exposes API called `get_olt_technology_from_unu_sn(onu_serial_number)` and `get_tech_profile(technology, tech_profile_id)`
+- The `VOLT_SERVICE` also exposes API called `get_olt_technology_from_unu_sn(onu_serial_number)` and `get_tech_profile(technology, tech_profile_id)`
   that returns a boolean. This is used to validate that the Technology Profile the subscriber
   is pointing to really exists. See [Technology Profile Management](https://github.com/opencord/voltha/tree/master/common/tech_profile) for more informations.
-
+- Second service is `ONOS_SERVICE` which adds a rest endpoint to the Sadis application in order to flush the cache for a single subscriber.This provides an endpoint
+  to flush the cache for a single subscriber as well as flush the entire cache.
 ## Synchronizer workflow
 
 The R-CORD Service synchronizer implements no sync steps as it does not directly interact with any external components. It does implement one model policy.
