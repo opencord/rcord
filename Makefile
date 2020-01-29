@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# foo bar
+
 # Configure shell
 SHELL = bash -e -o pipefail
 
