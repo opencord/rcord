@@ -72,7 +72,7 @@ class RCORDSubscriber(RCORDSubscriber_decl):
         # unused_s_tags_for_c_tag() this function will return a list of unused s_tags for that c_tag
 
         tag = random.choice(self.unused_s_tags_for_c_tag())
- 
+
         # Check that combination(c_tag,s_tag) is unique.
         # If the combination is not unique it will keep on calling this function recursively till it gets a unique combination.
 
@@ -150,7 +150,7 @@ class RCORDSubscriber(RCORDSubscriber_decl):
         return RCORDSubscriber.objects.filter(c_tag=self.c_tag, s_tag=self.s_tag)
 
     def get_used_c_tags(self):
-        same_onu_subscribers = self.get_same_onu_subscribers() 
+        same_onu_subscribers = self.get_same_onu_subscribers()
         same_onu_subscribers = [s for s in same_onu_subscribers if s.id != self.id]
         used_tags = [s.c_tag for s in same_onu_subscribers]
         return used_tags
@@ -162,7 +162,7 @@ class RCORDSubscriber(RCORDSubscriber_decl):
         if len(same_s_c_tag_subscribers) > 0:
             return same_s_c_tag_subscribers[0].id
         else:
-            return None 
+            return None
 
     def validate_tech_profile_id(self):
         if self.owner.leaf_model.access != "voltha":
@@ -175,7 +175,8 @@ class RCORDSubscriber(RCORDSubscriber_decl):
             if provider_service.name.lower() == "volt":
                 volt = provider_service
 
-        technology = volt.get_olt_technology_from_unu_sn(self.onu_device)
+        # When interacting with VOLT-service remove the -X from onu_device
+        technology = volt.get_olt_technology_from_unu_sn(self.onu_device.split('-')[0])
 
         try:
             tp = volt.get_tech_profile(technology, self.tech_profile_id)
@@ -229,7 +230,7 @@ class RCORDSubscriber(RCORDSubscriber_decl):
             id = self.get_used_s_c_tag_subscriber_id()
             if None != id and not is_update_with_same_tag:
                 raise XOSValidationError("The c_tag(%s) and s_tag(%s) pair you specified,has already been used by Subscriber with Id (%s)" % (self.c_tag,self.s_tag,id))
-                
+
 
         if not self.c_tag:
             self.c_tag = self.generate_c_tag()
@@ -250,7 +251,8 @@ class RCORDSubscriber(RCORDSubscriber_decl):
                 provider_service = ps.leaf_model
                 if provider_service.name.lower() == "volt":
                     volt_service = provider_service
-                    if not volt_service.has_access_device(self.onu_device):
+                    # When interacting with VOLT-service remove the -X from onu_device
+                    if not volt_service.has_access_device(self.onu_device.split('-')[0]):
                        raise XOSValidationError("The onu_device you specified (%s) does not exists" % self.onu_device)
 
             # if the access network is managed by voltha, validate that the tech_profile_id actually exists
@@ -260,4 +262,4 @@ class RCORDSubscriber(RCORDSubscriber_decl):
         super(RCORDSubscriber, self).save(*args, **kwargs)
         self.invalidate_related_objects()
         return
-                     
+
