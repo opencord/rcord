@@ -79,6 +79,7 @@ class TestRCORDModels(unittest.TestCase):
         self.rcord_subscriber.id = None  # this is a new model
         self.rcord_subscriber.is_new = True
         self.rcord_subscriber.onu_device = "BRCM1234"
+        self.rcord_subscriber.onu_device_uni = "BRCM1234-1"
         self.rcord_subscriber.c_tag = 111
         self.rcord_subscriber.s_tag = 222
         self.rcord_subscriber.ips = Mock()
@@ -236,7 +237,7 @@ class TestRCORDModels(unittest.TestCase):
         s.c_tag = "111"
         s.s_tag = "223"
         s.onu_device = "BRCM1234"
-        
+
         self.rcord_subscriber.get_same_onu_subscribers = Mock()
         self.rcord_subscriber.get_same_onu_subscribers.return_value = [s]
 
