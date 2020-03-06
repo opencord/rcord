@@ -14,9 +14,8 @@ message RCORDService (Service) {
 
 message BandwidthProfile(XOSBase) {
     option verbose_name = "Bandwidth Profile";
-    option description = "The Bandwidth Profile assinged to a residential subscriber";
+    option description = "The Bandwidth Profile assigned to a residential subscriber";
 
-    // TODO add help_text
     required string name = 3 [
         help_text = "Name of bandwidth profile",
         max_length = 256];
@@ -46,15 +45,6 @@ message RCORDSubscriber (ServiceInstance) {
         choices = "(('enabled', 'Enabled'), ('disabled', 'Disabled'), ('pre-provisioned', 'Pre Provisioned'), ('awaiting-auth', 'Awaiting Authentication'), ('auth-failed', 'Authentication Failed'))",
         max_length = 30];
 
-    // parameters for r-cord lite
-    optional int32 c_tag = 12 [
-        help_text = "Customer VLAN Tag, one half of the double-tag that identifies this subscriber's traffic",
-        min_value = 0,
-        max_value = 4096];
-    optional int32 s_tag = 19 [
-        help_text = "Service VLAN Tag, one half of the double-tag that identifies this subscriber's traffic",
-        min_value = 0,
-        max_value = 4096];
     required string onu_device = 13 [
         help_text = "ONUDevice serial number",
         max_length = 256,
@@ -62,10 +52,6 @@ message RCORDSubscriber (ServiceInstance) {
     optional string mac_address = 18 [
         help_text = "Subscriber MAC Address",
         max_length = 256];
-    required int32 tech_profile_id = 23 [
-        help_text = "Technology profile id to be used along with Technology type to retreive the profile. Make sure that the profile ID specified exists for the technology this subscriber's OLT is using.",
-        min_value = 64,
-        max_value = 255];
 
     // operator specific fields
     optional string nas_port_id = 20 [
@@ -77,11 +63,67 @@ message RCORDSubscriber (ServiceInstance) {
     optional string remote_id = 22 [
         help_text = "Option 82 Remote ID for DHCP relay agent",
         max_length = 256];
+}
 
-    required manytoone upstream_bps->BandwidthProfile:us_subscriber = 31:1001 [
-        help_text = "The subscriber the IP address belongs to"];
-    required manytoone downstream_bps->BandwidthProfile:ds_subscriber = 32:1002 [
-        help_text = "The subscriber the IP address belongs to"];
+message RCORDUniTagInformation(XOSBase) {
+    option verbose_name = "UNI Tag information";
+    option description = "An unit of information about a service";
+
+    required string tag_name = 1 [
+        help_text = "The name of the UNITag, used as Tosca Key",
+        max_length = 256,
+        tosca_key = True
+    ];
+
+    optional int32 uni_tag_match = 2 [
+        help_text = "The VLAN Tag coming from the RG",
+        min_value = 0,
+        max_value = 4096,
+        default = 0];
+    optional int32 pon_c_tag = 3 [
+        help_text = "Customer VLAN Tag, one half of the double-tag that identifies this subscriber's traffic",
+        min_value = 0,
+        max_value = 4096];
+    optional int32 pon_s_tag = 4 [
+        help_text = "Service VLAN Tag, one half of the double-tag that identifies this subscriber's traffic",
+        min_value = 0,
+        max_value = 4096];
+
+    optional int32 us_pon_ctag_priority = 5 [
+        help_text = "Upstream inner VLAN priority"];
+    optional int32 us_pon_stag_priority = 6 [
+        help_text = "Upstream outer VLAN priority"];
+    optional int32 ds_pon_ctag_priority = 7 [
+        help_text = "Downstream inner VLAN priority"];
+    optional int32 ds_pon_stag_priority = 8 [
+        help_text = "Downstream outer VLAN priority"];
+
+    optional string service_name = 9 [
+        max_length = 256];
+    optional bool enable_mac_learning = 10 [
+        help_text = "Using learnt destination MAC address for downstream flows",
+        default = False];
+    optional string configured_mac_address = 11 [
+        help_text = "Using configured destination MAC address matching for downstream flows",
+        max_length = 256];
+    optional bool is_dhcp_required = 12 [
+        help_text = "DHCP requirement",
+        default = True];
+    optional bool is_igmp_required = 13 [
+        help_text = "IGMP requirement",
+        default = False];
+
+    required int32 tech_profile_id = 23 [
+        help_text = "Technology profile id to be used along with Technology type to retrieve the profile. Make sure that the profile ID specified exists for the technology this subscriber's OLT is using.",
+        min_value = 64,
+        max_value = 255];
+    required manytoone upstream_bps->BandwidthProfile:us_unitag = 31:1001 [
+        help_text = "The UNI tag the upstream BW profile is assigned to"];
+    required manytoone downstream_bps->BandwidthProfile:ds_unitag = 32:1002 [
+        help_text = "The UNI tag the downstream BW profile is assigned to"];
+
+    required manytoone subscriber->RCORDSubscriber:unitaglist = 40:1002 [
+        help_text = "The subscriber the UNI Tag info belongs to"];
 }
 
 message RCORDIpAddress(XOSBase) {
