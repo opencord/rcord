@@ -57,6 +57,11 @@ class TestRCORDModels(unittest.TestCase):
         self.models_decl.RCORDIpAddress_decl.objects = Mock()
         self.models_decl.RCORDIpAddress_decl.objects.filter.return_value = []
 
+        self.models_decl.RCORDUniTagInformation_decl = MagicMock
+        self.models_decl.RCORDUniTagInformation_decl.save = Mock()
+        self.models_decl.RCORDUniTagInformation_decl.objects = Mock()
+        self.models_decl.RCORDUniTagInformation_decl.objects.filter.return_value = []
+
         modules = {
             'xos.exceptions': self.xos.exceptions,
             'models_decl': self.models_decl
@@ -65,23 +70,25 @@ class TestRCORDModels(unittest.TestCase):
         self.module_patcher = patch.dict('sys.modules', modules)
         self.module_patcher.start()
 
-        from models import RCORDSubscriber, RCORDIpAddress
+        from models import RCORDSubscriber, RCORDIpAddress, RCORDUniTagInformation
 
         self.volt = Mock(name="vOLT")
         self.volt.leaf_model.name = "vOLT"
         self.volt.get_olt_technology_from_unu_sn.return_value = "xgspon"
 
-
         self.rcord_subscriber_class = RCORDSubscriber
+
+        self.rcord_unitaginfo_class = RCORDUniTagInformation
+        self.rcord_unitaginfo = RCORDUniTagInformation(pon_c_tag=111, pon_s_tag=222)
+        self.rcord_unitaginfo.pon_c_tag = 111
+        self.rcord_unitaginfo.pon_s_tag = 222
 
         self.rcord_subscriber = RCORDSubscriber()
         self.rcord_subscriber.deleted = False
         self.rcord_subscriber.id = None  # this is a new model
         self.rcord_subscriber.is_new = True
         self.rcord_subscriber.onu_device = "BRCM1234"
-        self.rcord_subscriber.onu_device_uni = "BRCM1234-1"
-        self.rcord_subscriber.c_tag = 111
-        self.rcord_subscriber.s_tag = 222
+        self.rcord_subscriber.unitaglist = [self.rcord_unitaginfo]
         self.rcord_subscriber.ips = Mock()
         self.rcord_subscriber.ips.all.return_value = []
         self.rcord_subscriber.mac_address = "00:AA:00:00:00:01"
@@ -144,193 +151,28 @@ class TestRCORDModels(unittest.TestCase):
         self.rcord_subscriber.save()
         self.models_decl.RCORDSubscriber_decl.save.assert_called()
 
-    def test_validate_c_tag_pass(self):
-        """
-        check that other subscriber attached to the same ONU don't have the same c_tag
-        """
-
-        self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = [self.rcord_subscriber]
-
-        self.rcord_subscriber.save()
-
-        self.models_decl.RCORDSubscriber_decl.save.assert_called()
-
-    def test_validate_c_tag_fail(self):
-        """
-        check that other subscriber attached to the same ONU don't have the same c_tag
-        """
-
-        s = Mock()
-        s.c_tag = 111
-        s.onu_device = "BRCM1234"
-
-        self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = [s, self.rcord_subscriber]
-
-        with self.assertRaises(Exception) as e:
-            self.rcord_subscriber.save()
-
-        self.assertEqual(e.exception.message, "The c_tag you specified (111) has already been used on device BRCM1234")
-        self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
-
-    def test_validate_get_used_s_c_tag_subscriber_id(self):
-        """
-        check that other subscriber using the same s_tag don't have the same c_tag
-        """
-        s1 = Mock()
-        s1.id = 456
-        s1.c_tag = 999
-        s1.s_tag = 222
-        s1.onu_device = "BRCM1234"
-
-        s2 = Mock()
-        s2.id = 123
-        s2.c_tag = 111
-        s2.s_tag = 222
-        s2.onu_device = "BRCM12345"
-
-        self.rcord_subscriber.get_same_onu_subscribers = Mock()
-        self.rcord_subscriber.get_same_onu_subscribers.return_value = [s1]
-
-        self.rcord_subscriber.get_same_s_c_tag_subscribers = Mock()
-        self.rcord_subscriber.get_same_s_c_tag_subscribers.return_value = [s2]
-
-        with self.assertRaises(Exception) as e:
-            self.rcord_subscriber.save()
-
-        self.assertEqual(e.exception.message,
-                         "The c_tag(111) and s_tag(222) pair you specified,has already been used by Subscriber with Id (123)")
-        self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
-
-    def test_validate_c_tag_on_update(self):
-        s = Mock()
-        s.c_tag = 111
-        s.onu_device = "BRCM1234"
-        s.id = 1
-
-        self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = [s]
-
-        self.rcord_subscriber.is_new = False
-        self.rcord_subscriber.id = 1
-        self.rcord_subscriber.save()
-
-        self.models_decl.RCORDSubscriber_decl.save.assert_called()
-
-    def test_validate_c_tag_on_update_fail(self):
-        s = Mock()
-        s.c_tag = 222
-        s.onu_device = "BRCM1234"
-        s.id = 2
-
-        self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = [s]
-
-        self.rcord_subscriber.id = 1
-        self.rcord_subscriber.is_new = False
-        self.rcord_subscriber.c_tag = 222
-        with self.assertRaises(Exception) as e:
-            self.rcord_subscriber.save()
-
-        self.assertEqual(e.exception.message, "The c_tag you specified (222) has already been used on device BRCM1234")
-        self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
-
-    def test_generate_c_tag(self):
-        s = Mock()
-        s.c_tag = "111"
-        s.s_tag = "223"
-        s.onu_device = "BRCM1234"
-
-        self.rcord_subscriber.get_same_onu_subscribers = Mock()
-        self.rcord_subscriber.get_same_onu_subscribers.return_value = [s]
-
-        self.rcord_subscriber.get_same_s_c_tag_subscribers = Mock()
-        self.rcord_subscriber.get_same_s_c_tag_subscribers.return_value = []
-
-        self.rcord_subscriber.c_tag = None
-
-        self.rcord_subscriber.save()
-
-        self.models_decl.RCORDSubscriber_decl.save.assert_called()
-        self.assertNotEquals(self.rcord_subscriber.c_tag, "111")
-        self.assertGreater(self.rcord_subscriber.c_tag, 16)
-        self.assertLess(self.rcord_subscriber.c_tag, 4097)
-
-        #Testing whether the random generation choses c_tag from the list provided
-        self.rcord_subscriber.c_tag = None
-        self.rcord_subscriber.s_tag = None
-        self.rcord_subscriber.unused_c_tags_for_s_tag = Mock()
-        self.rcord_subscriber.unused_c_tags_for_s_tag.return_value = [18,19]
-
-        self.rcord_subscriber.save()
-        self.models_decl.RCORDSubscriber_decl.save.assert_called()
-        self.assertGreater(self.rcord_subscriber.c_tag, 17)
-        self.assertLess(self.rcord_subscriber.c_tag, 20)
-
-        self.rcord_subscriber.c_tag = None
-        self.rcord_subscriber.s_tag = None
-
-        self.rcord_subscriber.save()
-        self.models_decl.RCORDSubscriber_decl.save.assert_called()
-        self.assertGreater(self.rcord_subscriber.c_tag, 16)
-        self.assertLess(self.rcord_subscriber.c_tag, 4096)
-
-    def test_unused_c_tags_for_s_tag(self):
-        s=[]
-        for i in range(16,4097):
-            d = Mock()
-            d.c_tag = i
-            d.s_tag = "222"
-            d.onu_device = "BRCM1234"
-            s.append(d)
-
-        self.rcord_subscriber.get_same_onu_subscribers = Mock()
-        self.rcord_subscriber.get_same_onu_subscribers.return_value = []
-        self.rcord_subscriber.get_same_s_c_tag_subscribers = Mock()
-        self.rcord_subscriber.get_same_s_c_tag_subscribers.return_value = []
-
-        self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = s
-        self.rcord_subscriber.s_tag = 222
-        self.rcord_subscriber.c_tag = None
-        with self.assertRaises(Exception) as e:
-            self.rcord_subscriber.save()
-        self.assertEqual(e.exception.message, "All the c_tags are exhausted for this s_tag: 222")
-        self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
-
-    def test_unused_s_tags_for_c_tag(self):
-        s=[]
-        for i in range(16,4097):
-            d = Mock()
-            d.s_tag = i
-            d.c_tag = "111"
-            d.onu_device = "BRCM1234"
-            s.append(d)
-
-        self.rcord_subscriber.get_same_onu_subscribers = Mock()
-        self.rcord_subscriber.get_same_onu_subscribers.return_value = []
-        self.rcord_subscriber.get_same_s_c_tag_subscribers = Mock()
-        self.rcord_subscriber.get_same_s_c_tag_subscribers.return_value = []
-
-        self.models_decl.RCORDSubscriber_decl.objects.filter.return_value = s
-        self.rcord_subscriber.c_tag = 111
-        self.rcord_subscriber.s_tag = None
-        with self.assertRaises(Exception) as e:
-            self.rcord_subscriber.save()
-        self.assertEqual(e.exception.message, "All the s_tags are exhausted for this c_tag: 111")
-        self.models_decl.RCORDSubscriber_decl.save.assert_not_called()
-
-
-
-    def test_generate_s_tag(self):
-        self.rcord_subscriber.s_tag = None
-
-        self.rcord_subscriber.save()
-
-        self.models_decl.RCORDSubscriber_decl.save.assert_called()
-        self.assertNotEqual(self.rcord_subscriber.s_tag, None)
-
-
     def test_provisioned_s_stag(self):
         self.rcord_subscriber.save()
         self.models_decl.RCORDSubscriber_decl.save.assert_called()
-        self.assertEqual(self.rcord_subscriber.s_tag, 222)
+        self.assertEqual(self.rcord_subscriber.unitaglist[0].pon_s_tag, 222)
+
+    def test_tags_out_of_bound(self):
+        self.rcord_unitaginfo.pon_c_tag = 4096
+
+        with self.assertRaises(Exception) as e:
+            self.rcord_unitaginfo.save()
+
+        self.assertEqual(e.exception.message, "C-TAG out of range [16,4094]")
+        self.models_decl.RCORDUniTagInformation_decl.save.assert_not_called()
+
+        self.rcord_unitaginfo.pon_c_tag = 111
+        self.rcord_unitaginfo.pon_s_tag = 4096
+
+        with self.assertRaises(Exception) as e:
+            self.rcord_unitaginfo.save()
+
+        self.assertEqual(e.exception.message, "S-TAG out of range [16,4094]")
+        self.models_decl.RCORDUniTagInformation_decl.save.assert_not_called()
 
 
 if __name__ == '__main__':
