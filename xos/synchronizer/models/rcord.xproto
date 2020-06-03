@@ -79,9 +79,9 @@ message RCORDSubscriber (ServiceInstance) {
         max_length = 256];
 
     required manytoone upstream_bps->BandwidthProfile:us_subscriber = 31:1001 [
-        help_text = "The subscriber the IP address belongs to"];
+        help_text = "Upstream Bandwidth Profile for a subscriber"];
     required manytoone downstream_bps->BandwidthProfile:ds_subscriber = 32:1002 [
-        help_text = "The subscriber the IP address belongs to"];
+        help_text = "Downstream Bandwidth Profile for a subscriber"];
 }
 
 message RCORDIpAddress(XOSBase) {
